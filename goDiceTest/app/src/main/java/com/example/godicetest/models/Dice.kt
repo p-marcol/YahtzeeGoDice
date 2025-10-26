@@ -113,14 +113,17 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
      * and requests the color and charge level.
      */
     private fun startInitPackets() {
-        scheduleWrite(GoDiceSDK.openLedsPacket(0xff0000, 0x00ff00))
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                scheduleWrite(GoDiceSDK.closeToggleLedsPacket())
-            }
-        }, 3000)
-        scheduleWrite(GoDiceSDK.getColorPacket())
-        scheduleWrite(GoDiceSDK.getChargeLevelPacket())
+        scheduleWrite(
+            GoDiceSDK.initializationPacket(
+                GoDiceSDK.DICE_SENSITIVITY_DEFAULT,
+                2,
+                0.25f,
+                0.25f,
+                0x00ff00,
+                GoDiceSDK.DiceBlinkMode.PARALLEL,
+                GoDiceSDK.DiceLedsSelector.BOTH
+            )
+        )
     }
 
     /**

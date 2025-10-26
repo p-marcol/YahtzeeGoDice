@@ -10,6 +10,11 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godicetest.models.Dice
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 /**
  * RecyclerView Adapter for displaying a list of Dice.
@@ -29,6 +34,7 @@ class DiceAdapter(
      */
     inner class DiceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tvDiceName)
+        val tvState: TextView = itemView.findViewById(R.id.tvDiceState)
         val btnConnect: Button = itemView.findViewById(R.id.btnConnect)
         val root: View = itemView
     }
@@ -66,6 +72,30 @@ class DiceAdapter(
         holder.tvName.text = dice.getDieName()
         holder.btnConnect.setOnClickListener { onConnectClick(dice) }
         holder.root.setOnClickListener { onInfoClick(dice, holder.root) }
+
+        //reactive state updates
+        holder.itemView.tag?.let { previousJob ->
+            if (previousJob is Job) previousJob.cancel()
+        }
+
+        val job = CoroutineScope(Dispatchers.Main).launch {
+            combine(dice.lastRoll, dice.isStable) { roll, stable ->
+                roll to stable
+            }.collect { (roll, stable) ->
+                holder.tvState.text = when {
+                    dice.gatt == null -> "Not connected"
+                    roll == null -> "No roll"
+                    stable == false -> "Rolling..."
+                    stable == true -> roll.toString()
+                    else -> "Unknown"
+                }
+
+                holder.btnConnect.isEnabled = dice.gatt == null
+                holder.btnConnect.text = if (dice.gatt == null) "Connect" else "Connected"
+            }
+        }
+
+        holder.itemView.tag = job
     }
 
     // endregion
