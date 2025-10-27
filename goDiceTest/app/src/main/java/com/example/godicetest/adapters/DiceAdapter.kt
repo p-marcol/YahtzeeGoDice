@@ -35,6 +35,7 @@ class DiceAdapter(
     inner class DiceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tvDiceName)
         val tvState: TextView = itemView.findViewById(R.id.tvDiceState)
+        val tvColor: TextView = itemView.findViewById(R.id.tvDiceColor)
         val btnConnect: Button = itemView.findViewById(R.id.btnConnect)
         val root: View = itemView
     }
@@ -78,9 +79,10 @@ class DiceAdapter(
             if (previousJob is Job) previousJob.cancel()
         }
 
+
         val job = CoroutineScope(Dispatchers.Main).launch {
-            combine(dice.lastRoll, dice.isStable) { roll, stable ->
-                roll to stable
+            combine(dice.lastRoll, dice.isStable, dice.color) { roll, stable, color ->
+                Triple(roll, stable, color)
             }.collect { (roll, stable) ->
                 holder.tvState.text = when {
                     dice.gatt == null -> "Not connected"
@@ -90,9 +92,11 @@ class DiceAdapter(
                     else -> "Unknown"
                 }
 
+                holder.tvColor.text = dice.getColorName()
                 holder.btnConnect.isEnabled = dice.gatt == null
                 holder.btnConnect.text = if (dice.gatt == null) "Connect" else "Connected"
             }
+
         }
 
         holder.itemView.tag = job

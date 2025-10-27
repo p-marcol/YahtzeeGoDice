@@ -38,7 +38,7 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
     private var dieName = device.name
     var lastRoll = MutableStateFlow<Int?>(null)
     var isStable = MutableStateFlow<Boolean?>(true)
-    var color: Int? = null
+    var color = MutableStateFlow<Int?>(null)
     var batteryLevel = MutableStateFlow<Int>(0)
     var isCharging = MutableStateFlow<Boolean>(false)
 
@@ -76,6 +76,16 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
         scheduleWrite(GoDiceSDK.openLedsPacket(color1, color2))
     }
 
+    fun getColorName() = when (color.value) {
+        GoDiceSDK.DICE_BLACK -> "Black"
+        GoDiceSDK.DICE_RED -> "Red"
+        GoDiceSDK.DICE_GREEN -> "Green"
+        GoDiceSDK.DICE_BLUE -> "Blue"
+        GoDiceSDK.DICE_YELLOW -> "Yellow"
+        GoDiceSDK.DICE_ORANGE -> "Orange"
+        else -> "N/A"
+    }
+
     // endregion
     // region Bluetooth GATT handling
 
@@ -108,11 +118,14 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
         }
     }
 
+    // endregion
+    // region Data handling
+
     /**
-     * Starts sending initialization packets to the die. It opens the LEDs, then closes them after 3 seconds,
-     * and requests the color and charge level.
+     * Starts sending initialization packets to the die. Fetches the color and sends the initialization packet.
      */
     private fun startInitPackets() {
+        scheduleWrite(GoDiceSDK.getColorPacket()) // Request color first
         scheduleWrite(
             GoDiceSDK.initializationPacket(
                 GoDiceSDK.DICE_SENSITIVITY_DEFAULT,
@@ -123,7 +136,7 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
                 GoDiceSDK.DiceBlinkMode.PARALLEL,
                 GoDiceSDK.DiceLedsSelector.BOTH
             )
-        )
+        ) // Initialization packet
     }
 
     /**

@@ -22,7 +22,6 @@ import com.example.godicetest.managers.DiceManager
 import com.example.godicetest.managers.DiceStateListener
 import com.example.godicetest.models.Dice
 import kotlinx.coroutines.launch
-import org.sample.godicesdklib.GoDiceSDK
 
 /**
  * Main activity for the GoDice test application.
@@ -86,9 +85,9 @@ class MainActivity : AppCompatActivity() {
             override fun onColorChanged(dice: Dice, color: Int) {
                 Log.d(
                     "MainActivity",
-                    "Dice ${dice.getDieName()} Color Changed: ${colorName(color)}"
+                    "Dice ${dice.getDieName()} Color Changed: ${dice.getColorName()}"
                 )
-                appendLog("Dice ${dice.getDieName()} Color Changed: ${colorName(color)}")
+                appendLog("Dice ${dice.getDieName()} Color Changed: ${dice.getColorName()}")
             }
 
             override fun onStable(dice: Dice, face: Int) {
@@ -158,16 +157,6 @@ class MainActivity : AppCompatActivity() {
             textView.append("$msg\n")
             scrollView.fullScroll(ScrollView.FOCUS_DOWN)
         }
-    }
-
-    private fun colorName(color: Int) = when (color) {
-        GoDiceSDK.DICE_BLACK -> "Black"
-        GoDiceSDK.DICE_RED -> "Red"
-        GoDiceSDK.DICE_GREEN -> "Green"
-        GoDiceSDK.DICE_BLUE -> "Blue"
-        GoDiceSDK.DICE_YELLOW -> "Yellow"
-        GoDiceSDK.DICE_ORANGE -> "Orange"
-        else -> "Unknown"
     }
 }
 

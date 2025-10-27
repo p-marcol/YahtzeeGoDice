@@ -78,7 +78,7 @@ class DiceManager() : GoDiceSDK.Listener {
             override fun onDiceColor(diceId: Int, color: Int) {
                 Log.d("DiceManager", "Dice color changed: ID=$diceId, Color=$color")
                 val dice = dices.values.firstOrNull { it.getSdkId() == diceId } ?: return
-                dice.color = color
+                dice.color.value = color
                 listeners.forEach { it.onColorChanged(dice, color) }
             }
 
@@ -164,7 +164,7 @@ class DiceManager() : GoDiceSDK.Listener {
      */
     @SuppressLint("MissingPermission")
     fun connectDice(context: Context, dice: Dice) {
-        if (dice.gatt != null) return // już połączone
+        if (dice.gatt != null) return // already connected
         dice.gatt = dice.device.connectGatt(
             context,
             true,
@@ -219,6 +219,16 @@ class DiceManager() : GoDiceSDK.Listener {
      * @return A list of all Dice devices.
      */
     fun getAllDice(): List<Dice> = dices.values.toList()
+
+    /**
+     * Retrieves a list of Dice devices by their color.
+     *
+     * @param color The color value to filter Dice devices, as defined by GoDiceSDK.
+     * @return A list of Dice devices matching the specified color.
+     */
+    fun getDiceByColor(color: Int): List<Dice> {
+        return dices.values.filter { it.color.value == color }
+    }
 
     // endregion
     // region Private Methods
@@ -286,6 +296,7 @@ class DiceManager() : GoDiceSDK.Listener {
      */
     override fun onDiceColor(diceId: Int, color: Int) {
         val dice = dices[diceIds[diceId]] ?: return
+        dice.color.value = color
         Log.d("DiceManager", "Dice color: ID=$diceId, Color=$color")
         listeners.forEach { it.onColorChanged(dice, color) }
     }
