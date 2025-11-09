@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.godicetest.extensions.setNeonGlow
 import com.example.godicetest.models.Dice
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +72,7 @@ class DiceAdapter(
     override fun onBindViewHolder(holder: DiceViewHolder, position: Int) {
         val dice = diceList[position]
         holder.tvName.text = dice.getDieName()
+        holder.btnConnect.setNeonGlow("#3EFCFA")
         holder.btnConnect.setOnClickListener { onConnectClick(dice) }
         holder.root.setOnClickListener { onInfoClick(dice, holder.root) }
 

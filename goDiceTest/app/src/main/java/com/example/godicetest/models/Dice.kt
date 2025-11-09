@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.util.Log
+import com.example.godicetest.enums.eDicePattern
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.sample.godicesdklib.GoDiceSDK
 import java.util.LinkedList
@@ -83,7 +84,23 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
         GoDiceSDK.DICE_BLUE -> "Blue"
         GoDiceSDK.DICE_YELLOW -> "Yellow"
         GoDiceSDK.DICE_ORANGE -> "Orange"
-        else -> "N/A"
+        else -> "Unknown"
+    }
+
+    fun getDicePattern(): List<Boolean> {
+        return when (lastRoll.value) {
+            1 -> eDicePattern.Dice_1.pattern
+            2 -> eDicePattern.Dice_2.pattern
+            3 -> eDicePattern.Dice_3.pattern
+            4 -> eDicePattern.Dice_4.pattern
+            5 -> eDicePattern.Dice_5.pattern
+            6 -> eDicePattern.Dice_6.pattern
+            else -> eDicePattern.Dice_0.pattern
+        }
+    }
+
+    fun isConnected(): Boolean {
+        return gatt != null
     }
 
     // endregion
@@ -176,6 +193,16 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
                 nextWrite()
             }
         }
+    }
+
+    fun blinkLed(color: String) {
+        val colorInt = Integer.parseInt(color.removePrefix("#"), 16)
+        scheduleWrite(GoDiceSDK.openLedsPacket(colorInt, colorInt))
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                scheduleWrite(GoDiceSDK.closeToggleLedsPacket())
+            }
+        }, 500)
     }
 
     // endregion

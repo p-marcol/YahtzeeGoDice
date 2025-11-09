@@ -137,7 +137,7 @@ class DiceManager() : GoDiceSDK.Listener {
     fun startScan(adapter: BluetoothAdapter, onComplete: () -> Unit) {
         bluetoothScanner = adapter.bluetoothLeScanner
 
-        var filters = listOf(
+        val filters = listOf(
             ScanFilter.Builder().setServiceUuid(ParcelUuid(Dice.serviceUUID)).build()
         )
 
@@ -175,8 +175,14 @@ class DiceManager() : GoDiceSDK.Listener {
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
 //                        runOnMainThread { listeners.forEach { it.onStable(dice, 0) } }
                         dice.onConnected()
+                        runOnMainThread {
+                            listeners.forEach { it.onConnectionChanged(dice, true) }
+                        }
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                        runOnMainThread { listeners.forEach { it.onDisconnected(dice) } }
+                        runOnMainThread {
+                            listeners.forEach { it.onConnectionChanged(dice, false) }
+                            listeners.forEach { it.onDisconnected(dice) }
+                        }
                     }
                 }
 
@@ -361,6 +367,7 @@ interface DiceStateListener {
     fun onChargeLevel(dice: Dice, level: Int)
     fun onDisconnected(dice: Dice)
     fun onNewDiceDetected()
+    fun onConnectionChanged(dice: Dice, connected: Boolean)
     fun onLog(msg: String) {}
 }
 

@@ -1,0 +1,9 @@
+<resources>
+
+    <style name="diceCell">
+        <item name="android:layout_width">8dp</item>
+        <item name="android:layout_height">8dp</item>
+        <item name="android:layout_margin">1dp</item>
+        <item name="android:background">@drawable/dice_dot_off</item>
+    </style>
+</resources>

@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">godicesdk</string>
-    <string name="scan_for_godice">Scan For GoDice</string>
     <string name="list_of_godice_devices">List of GoDice devices</string>
+    <string name="connect">Connect</string>
+    <string name="color">Color</string>
+    <string name="unknown_state">Unknown State</string>
+    <string name="dice_name">Dice Name</string>
+    <string name="scan_dice">Scan for dice...</string>
 </resources>

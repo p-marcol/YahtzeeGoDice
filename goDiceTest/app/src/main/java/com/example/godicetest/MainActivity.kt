@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.godicetest.adapters.DiceViewAdapter
 import com.example.godicetest.managers.DiceManager
 import com.example.godicetest.managers.DiceStateListener
 import com.example.godicetest.models.Dice
@@ -34,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var diceAdapter: DiceAdapter
     private lateinit var textView: TextView
     private lateinit var scrollView: ScrollView
+    private lateinit var diceViewer: RecyclerView
+    private lateinit var diceViewAdapter: DiceViewAdapter
 
     private fun showDicePopover(anchor: View, dice: Dice) {
         val inflater = LayoutInflater.from(anchor.context)
@@ -79,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         textView = findViewById(R.id.textView)
         scrollView = findViewById(R.id.scrollView)
         recyclerView = findViewById(R.id.diceRecyclerView)
+        diceViewer = findViewById(R.id.diceViewer)
 
         diceManager = DiceManager.getInstance()
         diceManager.addListener(object : DiceStateListener {
@@ -119,6 +123,18 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread { updateDiceList() }
             }
 
+            override fun onConnectionChanged(
+                dice: Dice,
+                connected: Boolean
+            ) {
+                Log.d(
+                    "MainActivity",
+                    "Dice ${dice.getDieName()} Connection Changed: $connected"
+                )
+                appendLog("Dice ${dice.getDieName()} Connection Changed: $connected")
+                runOnUiThread { updateDiceList() }
+            }
+
             override fun onLog(msg: String) {
                 appendLog(msg)
             }
@@ -133,8 +149,23 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.adapter = diceAdapter
 
+        diceViewer.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+
+        diceViewAdapter =
+            DiceViewAdapter(
+                diceManager.getAllDice().filter { dice -> dice.isConnected() },
+                onDiceClick = { dice, view -> dice.blinkLed("#00FF00") }
+            )
+
+        diceViewer.adapter = diceViewAdapter
+
         findViewById<TextView>(R.id.scanButton).setOnClickListener {
             it.isEnabled = false
+            it.visibility = View.GONE
             val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
             val adapter = bluetoothManager.adapter
             PermissionsHelper.requestPermissions(this, adapter) {
@@ -150,6 +181,13 @@ class MainActivity : AppCompatActivity() {
             onInfoClick = { dice, view -> showDicePopover(view, dice) }
         )
         recyclerView.adapter = diceAdapter
+        diceViewAdapter =
+            DiceViewAdapter(
+                diceManager.getAllDice().filter { dice -> dice.isConnected() },
+                onDiceClick = { dice, view -> dice.blinkLed("#00FF00") }
+            )
+        diceViewer.adapter = diceViewAdapter
+        Log.d("DiceList", "Dice list updated")
     }
 
     private fun appendLog(msg: String) {

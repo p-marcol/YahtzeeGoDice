@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="12dp"
     android:layout_width="match_parent"
@@ -17,7 +18,7 @@
             android:id="@+id/tvDiceName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dice Name"
+            android:text="@string/dice_name"
             android:textSize="16sp" />
 
         <RelativeLayout
@@ -29,7 +30,7 @@
                 android:id="@+id/tvDiceState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Unknown State"
+                android:text="@string/unknown_state"
                 android:textSize="16sp" />
 
             <TextView
@@ -37,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
-                android:text="Color"
+                android:text="@string/color"
                 android:textSize="16sp" />
         </RelativeLayout>
     </LinearLayout>
@@ -46,5 +47,6 @@
         android:id="@+id/btnConnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connect" />
+        android:text="@string/connect"
+        app:strokeColor="@color/primary" />
 </LinearLayout>
