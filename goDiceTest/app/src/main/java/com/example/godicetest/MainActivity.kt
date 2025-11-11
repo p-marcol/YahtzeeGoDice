@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godicetest.adapters.DiceViewAdapter
+import com.example.godicetest.extensions.setNeonColor
 import com.example.godicetest.managers.DiceManager
 import com.example.godicetest.managers.DiceStateListener
 import com.example.godicetest.models.Dice
@@ -163,7 +164,10 @@ class MainActivity : AppCompatActivity() {
 
         diceViewer.adapter = diceViewAdapter
 
-        findViewById<TextView>(R.id.scanButton).setOnClickListener {
+        val scanButton = findViewById<Button>(R.id.scanButton)
+        scanButton.setNeonColor("#FF00FF")
+
+        scanButton.setOnClickListener {
             it.isEnabled = false
             it.visibility = View.GONE
             val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager

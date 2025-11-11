@@ -14,4 +14,7 @@
 
     <color name="textPrimary">#FFFFFFFF</color>
     <color name="textSecondary">#FFEDEDED</color>
+
+    <color name="background_primary">#000B2C</color>
+    <color name="background_secondary">#00072E</color>
 </resources>
