@@ -9,3 +9,6 @@ enum class eDiceNeonColor(val hexCode: String) {
     Orange("#FF5C00"),
     Unknown("#808080")
 }
+
+// End of eDiceNeonColor.kt.
+// Shades ready, dice ready, souls optional.

@@ -28,3 +28,5 @@ fun GridLayout.setNeonGlow(
     this.elevation = 10f
     this.translationZ = 10f
 }
+
+// GridLayout set. The devil rearranges the dots while you blink.

@@ -108,3 +108,5 @@ fun getColorHex(color: Int): String {
         else -> eDiceNeonColor.Unknown.hexCode
     }
 }
+
+// End of adapter. Luck’s a fiery mistress tonight.

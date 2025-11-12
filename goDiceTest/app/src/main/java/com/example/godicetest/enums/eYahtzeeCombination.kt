@@ -99,4 +99,5 @@ enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
     }
 }
 
-
+// End of eYahtzeeCombination.kt.
+// Full house or Yahtzee… the bartender already winked at the devil.

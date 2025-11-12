@@ -16,3 +16,6 @@ fun View.setNeonColor(
         this.background = wrapped
     }
 }
+
+// setNeonColor.kt complete.
+// The view glows. One dot, one spark, one devilish touch.

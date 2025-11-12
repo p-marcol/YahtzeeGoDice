@@ -51,3 +51,6 @@ enum class eDicePattern(val pattern: List<Boolean>) {
         )
     ),
 }
+
+// End of eDicePattern.kt.
+// Devil checks the dots, laughs, and lights a cigarette.

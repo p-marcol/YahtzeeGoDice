@@ -13,3 +13,6 @@ interface IDiceStateListener {
     fun onConnectionChanged(dice: Dice, connected: Boolean)
     fun onLog(msg: String) {}
 }
+
+// IDiceStateListener.kt finished.
+// Barman notes every flicker, but don’t worry… he’s on the house payroll.

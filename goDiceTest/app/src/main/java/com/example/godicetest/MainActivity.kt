@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godicetest.adapters.DiceViewAdapter
 import com.example.godicetest.extensions.setNeonColor
+import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.managers.DiceManager
-import com.example.godicetest.managers.DiceStateListener
 import com.example.godicetest.models.Dice
 import kotlinx.coroutines.launch
 
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         diceViewer = findViewById(R.id.diceViewer)
 
         diceManager = DiceManager.getInstance()
-        diceManager.addListener(object : DiceStateListener {
+        diceManager.addListener(object : IDiceStateListener {
             override fun onColorChanged(dice: Dice, color: Int) {
                 Log.d(
                     "MainActivity",
