@@ -6,4 +6,19 @@
     <string name="unknown_state">Unknown State</string>
     <string name="dice_name">Dice Name</string>
     <string name="scan_dice">Scan for dice...</string>
+    <string name="ones">Ones</string>
+    <string name="twos">Twos</string>
+    <string name="threes">Threes</string>
+    <string name="fours">Fours</string>
+    <string name="fives">Fives</string>
+    <string name="sixes">Sixes</string>
+    <string name="three_of_a_kind">Three of a kind</string>
+    <string name="four_of_a_kind">Four of a kind</string>
+    <string name="full_House">Full House</string>
+    <string name="small_Straight">Small Straight</string>
+    <string name="large_Straight">Large Straight</string>
+    <string name="yahtzee">Yahtzee</string>
+    <string name="chance">Chance</string>
+    <string name="total_Score">Total Score</string>
+    <string name="round">Round:</string>
 </resources>

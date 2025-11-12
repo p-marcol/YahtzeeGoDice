@@ -3,6 +3,7 @@
 
     <!-- Base application theme -->
     <style name="Theme.GoDiceTest" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:textColor">@color/white</item>
         <item name="android:windowFullscreen">true</item>
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryDark">@color/purple_700</item>
