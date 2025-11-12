@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.util.Log
 import com.example.godicetest.enums.eDicePattern
+import com.example.godicetest.interfaces.IDice
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.sample.godicesdklib.GoDiceSDK
 import java.util.LinkedList
@@ -25,7 +26,7 @@ import java.util.UUID
  * @param device The BluetoothDevice representing the die.
  */
 @SuppressLint("MissingPermission")
-class Dice(private val id: Int, val device: BluetoothDevice) {
+class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     // region Bluetooth GATT variables
     var gatt: BluetoothGatt? = null
     private var service: BluetoothGattService? = null
@@ -37,11 +38,18 @@ class Dice(private val id: Int, val device: BluetoothDevice) {
     // region properties
     private var writeInProgress = false
     private var dieName = device.name
-    var lastRoll = MutableStateFlow<Int?>(null)
-    var isStable = MutableStateFlow<Boolean?>(true)
     var color = MutableStateFlow<Int?>(null)
     var batteryLevel = MutableStateFlow<Int>(0)
     var isCharging = MutableStateFlow<Boolean>(false)
+
+    // region IDice
+
+    override var lastRoll = MutableStateFlow<Int?>(null)
+    override var isStable = MutableStateFlow<Boolean?>(true)
+
+    override fun roll() {
+        // No-op: roll is handled via notifications from the die
+    }
 
     // endregion
     // region getters and setters

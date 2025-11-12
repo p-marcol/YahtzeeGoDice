@@ -21,6 +21,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.models.Dice
 import org.sample.godicesdklib.GoDiceSDK
 import java.util.Timer
@@ -60,7 +61,7 @@ class DiceManager() : GoDiceSDK.Listener {
     private val dices = mutableMapOf<String, Dice>() // Address -> Dice
     private val diceIds = mutableListOf<String>() // List of Dice addresses
 
-    private val listeners = mutableListOf<DiceStateListener>()
+    private val listeners = mutableListOf<IDiceStateListener>()
 
     // endregion
     // region Initialization
@@ -121,7 +122,7 @@ class DiceManager() : GoDiceSDK.Listener {
      *
      * @param listener The listener to register.
      */
-    fun addListener(listener: DiceStateListener) {
+    fun addListener(listener: IDiceStateListener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener)
         }
@@ -357,21 +358,6 @@ class DiceManager() : GoDiceSDK.Listener {
 
     // endregion
 }
-
-// region interfaces
-interface DiceStateListener {
-    fun onColorChanged(dice: Dice, color: Int)
-    fun onStable(dice: Dice, face: Int)
-    fun onRolling(dice: Dice)
-    fun onChargingChanged(dice: Dice, charging: Boolean)
-    fun onChargeLevel(dice: Dice, level: Int)
-    fun onDisconnected(dice: Dice)
-    fun onNewDiceDetected()
-    fun onConnectionChanged(dice: Dice, connected: Boolean)
-    fun onLog(msg: String) {}
-}
-
-// endregion
 
 // DiceManager.kt closed.
 // Manager lights a cigarette, watches the dice roll on their own.
