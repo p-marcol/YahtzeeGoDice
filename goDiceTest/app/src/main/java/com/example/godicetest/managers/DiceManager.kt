@@ -128,6 +128,10 @@ class DiceManager() : GoDiceSDK.Listener {
         }
     }
 
+    fun removeListener(listener: IDiceStateListener) {
+        listeners.remove(listener)
+    }
+
     /**
      * Starts scanning for GoDice devices using the provided Bluetooth adapter.
      *
@@ -235,6 +239,12 @@ class DiceManager() : GoDiceSDK.Listener {
      */
     fun getDiceByColor(color: Int): List<Dice> {
         return dices.values.filter { it.color.value == color }
+    }
+
+    fun turnOffAllDiceLed() {
+        dices.values.forEach { dice ->
+            dice.scheduleWrite(GoDiceSDK.closeToggleLedsPacket())
+        }
     }
 
     // endregion

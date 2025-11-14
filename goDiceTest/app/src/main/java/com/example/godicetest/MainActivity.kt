@@ -22,6 +22,7 @@ import com.example.godicetest.adapters.DiceViewAdapter
 import com.example.godicetest.extensions.setNeonColor
 import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.managers.DiceManager
+import com.example.godicetest.managers.DiceSelector
 import com.example.godicetest.models.Dice
 import kotlinx.coroutines.launch
 
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var scrollView: ScrollView
     private lateinit var diceViewer: RecyclerView
     private lateinit var diceViewAdapter: DiceViewAdapter
+    private lateinit var diceSelector: DiceSelector
 
     private fun showDicePopover(anchor: View, dice: Dice) {
         val inflater = LayoutInflater.from(anchor.context)
@@ -159,25 +161,58 @@ class MainActivity : AppCompatActivity() {
         diceViewAdapter =
             DiceViewAdapter(
                 diceManager.getAllDice().filter { dice -> dice.isConnected() },
-                onDiceClick = { dice, view -> dice.blinkLed("#00FF00") }
+                onDiceClick = { dice, view -> dice.blinkLed(0x00FF00) }
             )
 
         diceViewer.adapter = diceViewAdapter
 
         val scanButton = findViewById<Button>(R.id.scanButton)
+        val diceSelection = findViewById<LinearLayout>(R.id.diceSelection)
         scanButton.setNeonColor("#FF00FF")
 
         scanButton.setOnClickListener {
             it.isEnabled = false
             it.visibility = View.GONE
+            diceSelection.visibility = View.VISIBLE
             val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
             val adapter = bluetoothManager.adapter
             PermissionsHelper.requestPermissions(this, adapter) {
                 diceManager.startScan(adapter) {}
             }
         }
+
+        val selectButton = findViewById<Button>(R.id.selectionButton)
+
+        selectButton.setNeonColor("#00FFFF")
+
+        selectButton.setOnClickListener {
+            startDiceSelection()
+        }
     }
 
+    /**
+     * Starts the dice selection process.
+     */
+    private fun startDiceSelection() {
+        val selectCount = findViewById<TextView>(R.id.selectionCount)
+        val count = selectCount.text.toString().toIntOrNull() ?: 1
+        appendLog("Starting dice selection for $count dice.")
+        diceManager.turnOffAllDiceLed()
+        diceSelector = DiceSelector(
+            diceManager,
+            count
+        ) { selectedDice ->
+            Log.d(
+                "Selection",
+                "Dice selection confirmed with ${selectedDice.size} dice."
+            )
+            appendLog("Dice selection confirmed with ${selectedDice.size} dice.")
+        }
+    }
+
+    /**
+     * Updates the dice list in the UI.
+     */
     private fun updateDiceList() {
         diceAdapter = DiceAdapter(
             diceManager.getAllDice(),
@@ -188,7 +223,7 @@ class MainActivity : AppCompatActivity() {
         diceViewAdapter =
             DiceViewAdapter(
                 diceManager.getAllDice().filter { dice -> dice.isConnected() },
-                onDiceClick = { dice, view -> dice.blinkLed("#00FF00") }
+                onDiceClick = { dice, view -> dice.blinkLed(0x00FF00) }
             )
         diceViewer.adapter = diceViewAdapter
         Log.d("DiceList", "Dice list updated")

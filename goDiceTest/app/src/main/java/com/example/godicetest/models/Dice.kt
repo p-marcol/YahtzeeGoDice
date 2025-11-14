@@ -203,14 +203,31 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
         }
     }
 
-    fun blinkLed(color: String) {
-        val colorInt = Integer.parseInt(color.removePrefix("#"), 16)
-        scheduleWrite(GoDiceSDK.openLedsPacket(colorInt, colorInt))
+    /**
+     * Makes the die's LED blink with specified parameters.
+     *
+     * @param color The color of the LED in RGB format, e.g., 0xff0000 for red.
+     * @param onDuration Duration in seconds for which the LED stays on during each blink. Default is 0.5 seconds.
+     * @param offDuration Duration in seconds for which the LED stays off during each blink. Default is 0.5 seconds.
+     * @param blinks Number of times the LED should blink. Default is 2.
+     */
+    fun blinkLed(color: Int, onDuration: Float = .5f, offDuration: Float = .5f, blinks: Int = 2) {
+        scheduleWrite(
+            GoDiceSDK.toggleLedsPacket(
+                blinks,
+                onDuration,
+                offDuration,
+                color,
+                GoDiceSDK.DiceBlinkMode.PARALLEL,
+                GoDiceSDK.DiceLedsSelector.BOTH
+            )
+        )
+        // TODO: Check if necessary
         Timer().schedule(object : TimerTask() {
             override fun run() {
                 scheduleWrite(GoDiceSDK.closeToggleLedsPacket())
             }
-        }, 500)
+        }, 1000)
     }
 
     // endregion

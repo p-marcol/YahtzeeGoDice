@@ -64,9 +64,9 @@ class DiceViewAdapter(
 
 
         val job = CoroutineScope(Dispatchers.Main).launch {
-            combine(dice.isStable, dice.color) { isStable, color ->
-                isStable to color
-            }.collect { (isStable, color) ->
+            combine(dice.isStable, dice.color, dice.lastRoll) { isStable, color, lastRoll ->
+                Triple(isStable, color, lastRoll)
+            }.collect { (isStable, color, lastRoll) ->
 
                 val colorHex = color?.let { getColorHex(it) } ?: eDiceNeonColor.Unknown.hexCode
 

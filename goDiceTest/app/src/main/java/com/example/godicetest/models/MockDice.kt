@@ -10,7 +10,7 @@ class MockDice(override val id: Int) : IDice {
     override fun roll() {
         isStable.value = false
         val rolled = (1..6).random()
-        println("🎲 Mock dice $id rolled: $rolled")
+        println("Mock dice $id rolled: $rolled")
         lastRoll.value = rolled
         isStable.value = true
     }

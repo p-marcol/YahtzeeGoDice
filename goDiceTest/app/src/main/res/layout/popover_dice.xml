@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="16dp"
     android:background="@drawable/popover_background"
@@ -13,26 +12,24 @@
         android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/tvBattery"
         android:text="Battery: 0%"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:textColor="@color/black" />
 
     <Button
         android:id="@+id/btnLedOn"
         android:text="LED On"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/btnLedOff"
         android:text="LED Off"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content" />
 </LinearLayout>
