@@ -10,8 +10,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 
+/**
+ * An Activity to request Bluetooth enabling and runtime permissions.
+ */
 @SuppressLint("MissingPermission")
 class PermissionsActivity : Activity() {
+
+    /**
+     * Called when the activity is created.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val intent = intent
@@ -30,10 +37,17 @@ class PermissionsActivity : Activity() {
         }
     }
 
+    /**
+     * Called when Bluetooth enabling request is replied.
+     * @see checkPermissions
+     */
     private fun bluetoothReplied() {
         checkPermissions()
     }
 
+    /**
+     * Checks and requests the necessary permissions.
+     */
     private fun checkPermissions() {
         val permissions = intent.getCharSequenceArrayExtra(PERMISSIONS_KEY) as Array<String>?
 
@@ -44,6 +58,11 @@ class PermissionsActivity : Activity() {
         }
     }
 
+    /**
+     * Called when permissions request is replied.
+     * @param permissions The requested permissions.
+     * @param grantResults The grant results for the corresponding permissions.
+     */
     private fun permissionsReplied(permissions: Array<String>, grantResults: IntArray) {
         val callback = PermissionsHelper.permissionsGrantedCallback
         if (callback != null) {
@@ -52,12 +71,23 @@ class PermissionsActivity : Activity() {
         finish()
     }
 
+    /**
+     * Called when an activity you launched exits, giving you the requestCode you started it with,
+     * the resultCode it returned, and any additional data from it.
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == BLUETOOTH_ENABLE_REQUEST_CODE) {
             bluetoothReplied()
         }
     }
 
+    /**
+     * Callback for the result from requesting permissions.
+     *
+     * @param requestCode The request code passed in requestPermissions.
+     * @param permissions The requested permissions.
+     * @param grantResults The grant results for the corresponding permissions.
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -68,12 +98,22 @@ class PermissionsActivity : Activity() {
         }
     }
 
+    /**
+     * Companion object to hold static members.
+     */
     companion object {
         private const val BLUETOOTH_ENABLE_REQUEST_CODE = 0x1ffff
         private const val PERMISSIONS_REQUEST_CODE = 0x2ffff
         private const val PERMISSIONS_KEY = "PERMISSIONS_KEY"
         private const val BLUETOOTH_KEY = "BLUETOOTH_KEY"
 
+        /**
+         * Requests the necessary permissions and Bluetooth enabling.
+         *
+         * @param activity The activity from which to request permissions.
+         * @param permissions The array of permissions to request.
+         * @param bluetooth Whether to request Bluetooth enabling.
+         */
         fun requestPermissions(activity: Activity, permissions: Array<String>, bluetooth: Boolean) {
             var needRequestPermissions = false
             for (permission in permissions) {

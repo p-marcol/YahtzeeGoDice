@@ -6,6 +6,15 @@ import android.graphics.drawable.GradientDrawable
 import android.widget.Button
 import androidx.core.graphics.toColorInt
 
+/**
+ * Sets a neon glow effect on the Button.
+ *
+ * @param colorHex The color in hexadecimal format (e.g., "#FF00FF").
+ * @param strokeWidth The width of the stroke around the Button.
+ * @param cornerRadius The corner radius for rounded corners.
+ * @param paddingDp The padding in dp to apply to the Button.
+ * @param glowRadii The list of radii for the glow effect.
+ */
 fun Button.setNeonGlow(
     colorHex: String,
     strokeWidth: Int = 4,

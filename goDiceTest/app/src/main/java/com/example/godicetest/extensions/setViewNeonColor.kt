@@ -5,6 +5,11 @@ import android.view.View
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.toColorInt
 
+/**
+ * Sets the neon color of the view's background.
+ *
+ * @param colorHex The color in hexadecimal format (e.g., "#FF00FF").
+ */
 fun View.setNeonColor(
     colorHex: String
 ) {

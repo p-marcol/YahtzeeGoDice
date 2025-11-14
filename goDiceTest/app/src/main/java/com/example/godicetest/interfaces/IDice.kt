@@ -2,6 +2,9 @@ package com.example.godicetest.interfaces
 
 import kotlinx.coroutines.flow.MutableStateFlow
 
+/**
+ * Interface representing a dice with rolling capabilities.
+ */
 interface IDice {
     val id: Int
     val lastRoll: MutableStateFlow<Int?>

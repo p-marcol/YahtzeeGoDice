@@ -8,6 +8,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import com.example.godicetest.R
 
+/**
+ * Sets a neon glow effect on the GridLayout.
+ *
+ * @param colorHex The color in hexadecimal format (e.g., "#FF00FF").
+ * @param strokeWidth The width of the stroke around the GridLayout.
+ * @param glowRadii The list of radii for the glow effect.
+ */
 fun GridLayout.setNeonGlow(
     colorHex: String,
     strokeWidth: Int = 8,

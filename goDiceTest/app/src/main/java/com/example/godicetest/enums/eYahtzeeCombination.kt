@@ -5,7 +5,13 @@ import androidx.annotation.StringRes
 import com.example.godicetest.R
 import com.example.godicetest.models.Dice
 
+/**
+ * Enum representing the different Yahtzee combinations.
+ *
+ * @property displayNameRes Resource ID for the display name of the combination.
+ */
 enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
+    // region Combination names
     ONES(R.string.ones),
     TWOS(R.string.twos),
     THREES(R.string.threes),
@@ -20,8 +26,23 @@ enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
     YAHTZEE(R.string.yahtzee),
     CHANCE(R.string.chance);
 
+    // endregion
+    // region Public Methods
+
+    /**
+     * Gets the display name of the combination.
+     *
+     * @param context The context to access resources.
+     * @return The display name string.
+     */
     fun getDisplayName(context: Context): String = context.getString(displayNameRes)
 
+    /**
+     * Calculates the score for the combination based on the given dice.
+     *
+     * @param dice The list of dice to evaluate.
+     * @return The calculated score.
+     */
     fun score(dice: List<Dice>): Int {
         val values = dice.mapNotNull { it.lastRoll.value }
         if (values.size < 5) return 0
@@ -49,6 +70,12 @@ enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
         }
     }
 
+    /**
+     * Gets the dice involved in the combination.
+     *
+     * @param dice The list of dice to evaluate.
+     * @return The list of dice involved in the combination.
+     */
     fun involvedDice(dice: List<Dice>): List<Dice> {
         val values = dice.mapNotNull { it.lastRoll.value }
         val counts = values.groupingBy { it }.eachCount()
@@ -79,15 +106,30 @@ enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
 
             else -> emptyList()
         }
-
-
     }
 
+    // endregion
+    // region Private Methods
+
+    /**
+     * Checks if the dice contain a straight of the specified length.
+     *
+     * @param dice The list of dice values.
+     * @param length The length of the straight to check for.
+     * @return True if a straight of the specified length exists, false otherwise.
+     */
     private fun hasStraight(dice: List<Int>, length: Int): Boolean =
         dice.toSet().sorted().windowed(length, 1).any { seq ->
             seq.zipWithNext().all { (a, b) -> b == a + 1 }
         }
 
+    /**
+     * Gets the straight values from the dice values.
+     *
+     * @param values The list of dice values.
+     * @param length The length of the straight to retrieve.
+     * @return The list of straight values if found, otherwise an empty list.
+     */
     private fun getStraightValues(values: List<Int>, length: Int): List<Int> {
         val uniq = values.distinct().sorted()
         val straights = listOf(

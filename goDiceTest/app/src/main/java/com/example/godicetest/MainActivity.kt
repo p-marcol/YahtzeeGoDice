@@ -41,6 +41,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var diceViewAdapter: DiceViewAdapter
     private lateinit var diceSelector: DiceSelector
 
+    /**
+     * Shows a popover with dice information and controls.
+     *
+     * @param anchor The view to anchor the popover to.
+     * @param dice The dice object to display information for.
+     */
     private fun showDicePopover(anchor: View, dice: Dice) {
         val inflater = LayoutInflater.from(anchor.context)
         val popupView = inflater.inflate(R.layout.popover_dice, null)
@@ -78,6 +84,11 @@ class MainActivity : AppCompatActivity() {
         popup.showAsDropDown(anchor, 0, -anchor.height)
     }
 
+    /**
+     * Called when the activity is created.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -229,6 +240,11 @@ class MainActivity : AppCompatActivity() {
         Log.d("DiceList", "Dice list updated")
     }
 
+    /**
+     * Appends a log message to the text view.
+     *
+     * @param msg The message to append.
+     */
     private fun appendLog(msg: String) {
         runOnUiThread {
             textView.append("$msg\n")

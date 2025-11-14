@@ -2,6 +2,9 @@ package com.example.godicetest.interfaces
 
 import com.example.godicetest.models.Dice
 
+/**
+ * Interface for listening to state changes in a Dice object.
+ */
 interface IDiceStateListener {
     fun onColorChanged(dice: Dice, color: Int)
     fun onStable(dice: Dice, face: Int)

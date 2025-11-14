@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 
 /**
  * RecyclerView Adapter for displaying a list of Dice.
+ *
  * @param diceList The list of Dice to display.
  * @param onConnectClick Callback for when the connect button is clicked.
  * @param onInfoClick Callback for when the item is clicked for more info.

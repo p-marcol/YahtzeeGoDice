@@ -17,11 +17,22 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.sample.godicesdklib.GoDiceSDK
 
+/**
+ * Adapter for displaying a list of Dice in a RecyclerView.
+ *
+ * @param diceList The list of Dice to display.
+ * @param onDiceClick Callback function to handle dice click events.
+ * @return RecyclerView.Adapter for DiceViewHolder.
+ */
 class DiceViewAdapter(
     private val diceList: List<Dice>,
     private val onDiceClick: (Dice, View) -> Unit
 ) : RecyclerView.Adapter<DiceViewAdapter.DiceViewHolder>() {
 
+    /** ViewHolder for a single Dice item.
+     *
+     * @param itemView The view representing a single dice item.
+     */
     inner class DiceViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         var diceGrid: NeonGridLayout = itemView.findViewById(R.id.diceGrid)
@@ -40,6 +51,12 @@ class DiceViewAdapter(
 
     // region RecyclerView.Adapter methods
 
+    /** Creates a new DiceViewHolder.
+     *
+     * @param parent The parent ViewGroup.
+     * @param viewType The view type of the new View.
+     * @return A new DiceViewHolder instance.
+     */
     override fun onCreateViewHolder(
         parent: android.view.ViewGroup,
         viewType: Int
@@ -49,6 +66,11 @@ class DiceViewAdapter(
         return DiceViewHolder(view)
     }
 
+    /** Binds data to the DiceViewHolder at the specified position.
+     *
+     * @param holder The DiceViewHolder to bind data to.
+     * @param position The position of the item in the data set.
+     */
     override fun onBindViewHolder(
         holder: DiceViewHolder,
         position: Int
@@ -97,6 +119,12 @@ class DiceViewAdapter(
     override fun getItemCount(): Int = diceList.size
 }
 
+/**
+ * Returns the hexadecimal color code for the given dice color.
+ *
+ * @param color The dice color code.
+ * @return The corresponding hexadecimal color code as a string.
+ */
 fun getColorHex(color: Int): String {
     return when (color) {
         GoDiceSDK.DICE_BLACK -> eDiceNeonColor.Black.hexCode

@@ -42,6 +42,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     var batteryLevel = MutableStateFlow<Int>(0)
     var isCharging = MutableStateFlow<Boolean>(false)
 
+    // endregion
     // region IDice
 
     override var lastRoll = MutableStateFlow<Int?>(null)
@@ -85,6 +86,10 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
         scheduleWrite(GoDiceSDK.openLedsPacket(color1, color2))
     }
 
+    /**
+     * Returns the name of the die's color based on its color code.
+     * @return The color name as a string.
+     */
     fun getColorName() = when (color.value) {
         GoDiceSDK.DICE_BLACK -> "Black"
         GoDiceSDK.DICE_RED -> "Red"
@@ -95,6 +100,10 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
         else -> "Unknown"
     }
 
+    /**
+     * Returns the dice pattern corresponding to the last roll.
+     * @return A list of booleans representing the dice pattern.
+     */
     fun getDicePattern(): List<Boolean> {
         return when (lastRoll.value) {
             1 -> eDicePattern.Dice_1.pattern
@@ -107,6 +116,10 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
         }
     }
 
+    /**
+     * Checks if the die is currently connected.
+     * @return True if connected, false otherwise.
+     */
     fun isConnected(): Boolean {
         return gatt != null
     }

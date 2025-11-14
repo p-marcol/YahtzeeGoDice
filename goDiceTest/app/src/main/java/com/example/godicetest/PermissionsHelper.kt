@@ -10,9 +10,19 @@ import android.content.pm.PackageManager
 import android.os.Build
 import java.lang.ref.WeakReference
 
+/**
+ * Helper methods to request Bluetooth and runtime permissions.
+ */
 object PermissionsHelper {
     var activity: WeakReference<Activity> = WeakReference(null)
 
+    /**
+     * Requests necessary permissions for Bluetooth operations.
+     *
+     * @param activity The activity from which permissions are requested.
+     * @param adapter The BluetoothAdapter to check if Bluetooth is enabled.
+     * @param completion A callback to be invoked once permissions are granted.
+     */
     fun requestPermissions(activity: Activity, adapter: BluetoothAdapter?, completion: () -> Unit) {
         this.activity = WeakReference(activity)
         var bluetooth = false
@@ -46,6 +56,11 @@ object PermissionsHelper {
         }
     }
 
+    /**
+     * Checks for any missing manifest permissions.
+     *
+     * @return A list of missing permissions, or null if all are granted.
+     */
     internal fun checkMissingManifestPermissions(): List<String>? {
         var requiredPermissions = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -71,9 +86,20 @@ object PermissionsHelper {
         }
     }
 
+    /**
+     * Callback to be invoked when permissions are granted.
+     *
+     * @param permissions The array of permissions requested.
+     * @param grantResults The results for the corresponding permissions.
+     */
     var permissionsGrantedCallback: ((permissions: Array<String>, grantResults: IntArray) -> Unit)? =
         null
 
+    /**
+     * Checks if BLE is supported on the device.
+     *
+     * @return True if BLE is supported, false otherwise.
+     */
     private fun isBLESupported(): Boolean {
         if (activity.get()?.packageManager?.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE) == false) {
             return false
