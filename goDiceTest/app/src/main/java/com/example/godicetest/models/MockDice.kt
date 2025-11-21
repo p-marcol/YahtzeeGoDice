@@ -13,6 +13,11 @@ import org.sample.godicesdklib.GoDiceSDK
  * @param id The unique identifier for the mock dice.
  */
 class MockDice(override val id: Int) : IDice {
+
+    companion object {
+        private var colorId = 0
+    }
+
     //region State
     override val lastRoll = MutableStateFlow<Int?>(null)
     override val isStable = MutableStateFlow<Boolean?>(true)
@@ -32,6 +37,14 @@ class MockDice(override val id: Int) : IDice {
     override fun getDieName(): String = "Mock $id"
     //endregion
 
+    //region Initialization
+
+    init {
+        color.value = colorId++ % 6
+    }
+
+    //endregion
+
     //region Connection lifecycle
     override fun isConnected(): Boolean = connected
     override fun onConnected() {}
@@ -42,6 +55,7 @@ class MockDice(override val id: Int) : IDice {
     fun connect() {
         connected = true
         Log.d("MockDice", "Mock dice $id connected.")
+        roll()
     }
 
     fun disconnect() {

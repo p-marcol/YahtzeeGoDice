@@ -63,11 +63,12 @@ class MockDiceManager private constructor() : IDiceManager {
         shakeDetector.start(context.applicationContext)
 
         shakeDetector.onShake = {
-            diceList.forEach { mockDice ->
-                listeners.forEach { it.onRolling(mockDice) }
-                mockDice.roll()
-                listeners.forEach { it.onStable(mockDice, mockDice.lastRoll.value!!) }
-            }
+            diceList.filter { it.isConnected() }
+                .forEach { mockDice ->
+                    listeners.forEach { it.onRolling(mockDice) }
+                    mockDice.roll()
+                    listeners.forEach { it.onStable(mockDice, mockDice.lastRoll.value!!) }
+                }
         }
     }
     //endregion
