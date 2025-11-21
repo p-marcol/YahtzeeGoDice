@@ -9,6 +9,7 @@ The app uses Bluetooth Low Energy to connect with GoDice and react to real dice 
 
 -   Connect and manage multiple GoDice devices
 -   Real-time roll detection and color updates
+-   Optional Mock Dice mode for development (dice appear only after tapping **Scan Dice**)
 -   Full Yahtzee gameplay mechanics:
     -   Up to 3 rolls per turn
     -   Automatic scoring system
@@ -42,6 +43,24 @@ The app uses Bluetooth Low Energy to connect with GoDice and react to real dice 
 2. Open the project in Android Studio
 3. Connect a real Android device (BLE features are not supported on most emulators)
 4. Pair your GoDice and run the app ✅
+
+---
+
+## 🧪 Mock Dice Mode
+
+Need to work without real hardware? Use the `mock` build flavor:
+
+```bash
+./gradlew :app:assembleMockDebug
+```
+
+In this flavor the app wires itself to `MockDiceManager`. Mock dice are created **only after** you tap the **Scan Dice** button, mirroring the flow of the real scanner. Everything else (selection, LED prompts, UI updates) behaves the same, so you can iterate quickly before testing on real GoDice.
+
+Switch back to the `real` flavor when targeting physical dice:
+
+```bash
+./gradlew :app:assembleRealDebug
+```
 
 ---
 
