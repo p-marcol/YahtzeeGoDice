@@ -1,8 +1,9 @@
 package com.example.godicetest.managers
 
 import android.util.Log
+import com.example.godicetest.interfaces.IDice
+import com.example.godicetest.interfaces.IDiceManager
 import com.example.godicetest.interfaces.IDiceStateListener
-import com.example.godicetest.models.Dice
 
 /**
  * Manages the selection of a specific number of dice from the DiceManager.
@@ -12,14 +13,14 @@ import com.example.godicetest.models.Dice
  * @param onSelectionConfirmed Callback invoked when the required number of dice have been selected.
  */
 class DiceSelector(
-    private val manager: DiceManager,
+    private val manager: IDiceManager,
     private val requiredCount: Int,
-    private val onSelectionConfirmed: (List<Dice>) -> Unit
+    private val onSelectionConfirmed: (List<IDice>) -> Unit
 ) : IDiceStateListener {
 
     // region Properties
 
-    private val selectedDice = mutableSetOf<Dice>()
+    private val selectedDice = mutableSetOf<IDice>()
     private var ready = false
 
     // endregion
@@ -65,7 +66,7 @@ class DiceSelector(
      * @param dice The die that became stable.
      * @param face The face value of the die.
      */
-    override fun onStable(dice: Dice, face: Int) {
+    override fun onStable(dice: IDice, face: Int) {
         if (ready) return
 
         if (!selectedDice.contains(dice)) {
@@ -84,17 +85,17 @@ class DiceSelector(
         }
     }
 
-    override fun onRolling(dice: Dice) {}
+    override fun onRolling(dice: IDice) {}
 
-    override fun onColorChanged(dice: Dice, color: Int) {}
+    override fun onColorChanged(dice: IDice, color: Int) {}
 
-    override fun onChargingChanged(dice: Dice, charging: Boolean) {}
+    override fun onChargingChanged(dice: IDice, charging: Boolean) {}
 
-    override fun onChargeLevel(dice: Dice, level: Int) {}
+    override fun onChargeLevel(dice: IDice, level: Int) {}
 
-    override fun onDisconnected(dice: Dice) {}
+    override fun onDisconnected(dice: IDice) {}
 
     override fun onNewDiceDetected() {}
 
-    override fun onConnectionChanged(dice: Dice, connected: Boolean) {}
+    override fun onConnectionChanged(dice: IDice, connected: Boolean) {}
 }

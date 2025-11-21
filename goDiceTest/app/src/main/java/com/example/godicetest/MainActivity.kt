@@ -20,10 +20,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godicetest.adapters.DiceViewAdapter
 import com.example.godicetest.extensions.setNeonColor
+import com.example.godicetest.interfaces.IDice
+import com.example.godicetest.interfaces.IDiceManager
 import com.example.godicetest.interfaces.IDiceStateListener
-import com.example.godicetest.managers.DiceManager
+import com.example.godicetest.managers.DiceManagerFactory
 import com.example.godicetest.managers.DiceSelector
-import com.example.godicetest.models.Dice
 import kotlinx.coroutines.launch
 
 /**
@@ -32,7 +33,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("MissingPermission")
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var diceManager: DiceManager
+    private lateinit var diceManager: IDiceManager
     private lateinit var recyclerView: RecyclerView
     private lateinit var diceAdapter: DiceAdapter
     private lateinit var textView: TextView
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
      * @param anchor The view to anchor the popover to.
      * @param dice The dice object to display information for.
      */
-    private fun showDicePopover(anchor: View, dice: Dice) {
+    private fun showDicePopover(anchor: View, dice: IDice) {
         val inflater = LayoutInflater.from(anchor.context)
         val popupView = inflater.inflate(R.layout.popover_dice, null)
 
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         val btnLedOn = popupView.findViewById<Button>(R.id.btnLedOn)
         val btnLedOff = popupView.findViewById<Button>(R.id.btnLedOff)
 
-        tvName.text = dice.getDieName() ?: "Dice ${dice.getSdkId()}"
+        tvName.text = dice.getDieName() ?: "Dice ${dice.id}"
 
         btnLedOn.setOnClickListener { dice.setLed(true) }
         btnLedOff.setOnClickListener { dice.setLed(false) }
@@ -98,9 +99,15 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.diceRecyclerView)
         diceViewer = findViewById(R.id.diceViewer)
 
-        diceManager = DiceManager.getInstance()
+        DiceManagerFactory.mode = if (BuildConfig.USE_MOCK_DICE) {
+            DiceManagerFactory.Mode.MOCK
+        } else {
+            DiceManagerFactory.Mode.REAL
+        }
+
+        diceManager = DiceManagerFactory.getManager()
         diceManager.addListener(object : IDiceStateListener {
-            override fun onColorChanged(dice: Dice, color: Int) {
+            override fun onColorChanged(dice: IDice, color: Int) {
                 Log.d(
                     "MainActivity",
                     "Dice ${dice.getDieName()} Color Changed: ${dice.getColorName()}"
@@ -108,27 +115,27 @@ class MainActivity : AppCompatActivity() {
                 appendLog("Dice ${dice.getDieName()} Color Changed: ${dice.getColorName()}")
             }
 
-            override fun onStable(dice: Dice, face: Int) {
+            override fun onStable(dice: IDice, face: Int) {
                 Log.d("MainActivity", "Dice ${dice.getDieName()} Stable: $face")
                 appendLog("Dice ${dice.getDieName()} Stable: $face")
             }
 
-            override fun onRolling(dice: Dice) {
+            override fun onRolling(dice: IDice) {
                 Log.d("MainActivity", "Dice ${dice.getDieName()} Rolling")
                 appendLog("Dice ${dice.getDieName()} Rolling")
             }
 
-            override fun onChargingChanged(dice: Dice, charging: Boolean) {
+            override fun onChargingChanged(dice: IDice, charging: Boolean) {
                 Log.d("MainActivity", "Dice ${dice.getDieName()} Charging: $charging")
                 appendLog("Dice ${dice.getDieName()} Charging: $charging")
             }
 
-            override fun onChargeLevel(dice: Dice, level: Int) {
+            override fun onChargeLevel(dice: IDice, level: Int) {
                 Log.d("MainActivity", "Dice ${dice.getDieName()} Battery Level: $level")
                 appendLog("Dice ${dice.getDieName()} Battery Level: $level")
             }
 
-            override fun onDisconnected(dice: Dice) {
+            override fun onDisconnected(dice: IDice) {
                 Log.d("MainActivity", "Dice ${dice.getDieName()} Disconnected")
                 appendLog("Dice ${dice.getDieName()} Disconnected")
             }
@@ -138,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onConnectionChanged(
-                dice: Dice,
+                dice: IDice,
                 connected: Boolean
             ) {
                 Log.d(
@@ -158,7 +165,8 @@ class MainActivity : AppCompatActivity() {
         diceAdapter = DiceAdapter(
             diceManager.getAllDice(),
             { dice -> diceManager.connectDice(this, dice) },
-            { dice, view -> showDicePopover(view, dice) }
+            { dice, view -> showDicePopover(view, dice) },
+            diceManager::isConnected
         )
 
         recyclerView.adapter = diceAdapter
@@ -171,7 +179,7 @@ class MainActivity : AppCompatActivity() {
 
         diceViewAdapter =
             DiceViewAdapter(
-                diceManager.getAllDice().filter { dice -> dice.isConnected() },
+                diceManager.getAllDice().filter { dice -> diceManager.isConnected(dice) },
                 onDiceClick = { dice, view -> dice.blinkLed(0x00FF00) }
             )
 
@@ -228,12 +236,13 @@ class MainActivity : AppCompatActivity() {
         diceAdapter = DiceAdapter(
             diceManager.getAllDice(),
             onConnectClick = { dice -> diceManager.connectDice(this, dice) },
-            onInfoClick = { dice, view -> showDicePopover(view, dice) }
+            onInfoClick = { dice, view -> showDicePopover(view, dice) },
+            isDiceConnected = diceManager::isConnected
         )
         recyclerView.adapter = diceAdapter
         diceViewAdapter =
             DiceViewAdapter(
-                diceManager.getAllDice().filter { dice -> dice.isConnected() },
+                diceManager.getAllDice().filter { dice -> diceManager.isConnected(dice) },
                 onDiceClick = { dice, view -> dice.blinkLed(0x00FF00) }
             )
         diceViewer.adapter = diceViewAdapter

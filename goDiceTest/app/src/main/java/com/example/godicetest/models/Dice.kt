@@ -26,9 +26,9 @@ import java.util.UUID
  * @param device The BluetoothDevice representing the die.
  */
 @SuppressLint("MissingPermission")
-class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
+class Dice(override val id: Int, override val device: BluetoothDevice) : IDice {
     // region Bluetooth GATT variables
-    var gatt: BluetoothGatt? = null
+    private var gatt: BluetoothGatt? = null
     private var service: BluetoothGattService? = null
     private var writeChar: BluetoothGattCharacteristic? = null
     private var readChar: BluetoothGattCharacteristic? = null
@@ -38,9 +38,9 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     // region properties
     private var writeInProgress = false
     private var dieName = device.name
-    var color = MutableStateFlow<Int?>(null)
-    var batteryLevel = MutableStateFlow<Int>(0)
-    var isCharging = MutableStateFlow<Boolean>(false)
+    override var color = MutableStateFlow<Int?>(null)
+    override var batteryLevel = MutableStateFlow<Int>(0)
+    override var isCharging = MutableStateFlow<Boolean>(false)
 
     // endregion
     // region IDice
@@ -58,7 +58,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     /**
      * Returns the name of the die, or null if not available.
      */
-    fun getDieName(): String? = dieName
+    override fun getDieName(): String? = dieName
 
     /**
      * Returns the SDK ID of the die.
@@ -69,7 +69,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
      * Sets the LED state of the die.
      * @param on True to turn on the LED, false to turn it off.
      */
-    fun setLed(on: Boolean) {
+    override fun setLed(on: Boolean) {
         if (on) {
             scheduleWrite(GoDiceSDK.openLedsPacket(0x0000ff, 0xffff00))
         } else {
@@ -82,7 +82,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
      * @param color1 The first color in RGB format, ex. 0xff0000 for red.
      * @param color2 The second color in RGB format, ex. 0x00ff00 for green.
      */
-    fun setLed(color1: Int, color2: Int) {
+    override fun setLed(color1: Int, color2: Int) {
         scheduleWrite(GoDiceSDK.openLedsPacket(color1, color2))
     }
 
@@ -90,7 +90,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
      * Returns the name of the die's color based on its color code.
      * @return The color name as a string.
      */
-    fun getColorName() = when (color.value) {
+    override fun getColorName() = when (color.value) {
         GoDiceSDK.DICE_BLACK -> "Black"
         GoDiceSDK.DICE_RED -> "Red"
         GoDiceSDK.DICE_GREEN -> "Green"
@@ -104,7 +104,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
      * Returns the dice pattern corresponding to the last roll.
      * @return A list of booleans representing the dice pattern.
      */
-    fun getDicePattern(): List<Boolean> {
+    override fun getDicePattern(): List<Boolean> {
         return when (lastRoll.value) {
             1 -> eDicePattern.Dice_1.pattern
             2 -> eDicePattern.Dice_2.pattern
@@ -120,7 +120,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
      * Checks if the die is currently connected.
      * @return True if connected, false otherwise.
      */
-    fun isConnected(): Boolean {
+    override fun isConnected(): Boolean {
         return gatt != null
     }
 
@@ -130,7 +130,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     /**
      * Called when the die is connected.
      */
-    fun onConnected() {
+    override fun onConnected() {
         gatt?.discoverServices()
         Log.d("Dice", "$id: Connected to ${device.address}")
         // Start initialization packets after a short delay to ensure services are discovered
@@ -144,7 +144,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     /**
      * Called when services are discovered. It has to be set up before any read/write operations.
      */
-    fun onServicesDiscovered() {
+    override fun onServicesDiscovered() {
         service = gatt?.services?.firstOrNull { it.uuid == serviceUUID }
         writeChar = service?.characteristics?.firstOrNull { it.uuid == writeCharUUID }
         readChar = service?.characteristics?.firstOrNull { it.uuid == readCharUUID }
@@ -180,7 +180,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     /**
      * Called when a notification is received from the die, then processes the incoming data through the SDK.
      */
-    fun onEvent() {
+    override fun onEvent() {
         readChar?.value?.let {
             Log.d("Dice", "$id: readChar value: ${it.joinToString(",")}")
             GoDiceSDK.incomingPacket(id, GoDiceSDK.DiceType.D6, it)
@@ -190,7 +190,7 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
     /**
      * Processes the next write in the queue, if any.
      */
-    fun nextWrite() {
+    override fun nextWrite() {
         synchronized(writes) {
             writeInProgress = false
             writes.poll()?.let { value ->
@@ -216,6 +216,15 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
         }
     }
 
+    internal fun bindGatt(gatt: BluetoothGatt?) {
+        this.gatt = gatt
+    }
+
+    internal fun closeGatt() {
+        gatt?.close()
+        gatt = null
+    }
+
     /**
      * Makes the die's LED blink with specified parameters.
      *
@@ -224,7 +233,12 @@ class Dice(override val id: Int, val device: BluetoothDevice) : IDice {
      * @param offDuration Duration in seconds for which the LED stays off during each blink. Default is 0.5 seconds.
      * @param blinks Number of times the LED should blink. Default is 2.
      */
-    fun blinkLed(color: Int, onDuration: Float = .5f, offDuration: Float = .5f, blinks: Int = 2) {
+    override fun blinkLed(
+        color: Int,
+        onDuration: Float,
+        offDuration: Float,
+        blinks: Int
+    ) {
         scheduleWrite(
             GoDiceSDK.toggleLedsPacket(
                 blinks,

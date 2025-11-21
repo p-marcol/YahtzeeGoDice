@@ -10,7 +10,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godicetest.extensions.setNeonGlow
-import com.example.godicetest.models.Dice
+import com.example.godicetest.interfaces.IDice
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,9 +25,10 @@ import kotlinx.coroutines.launch
  * @param onInfoClick Callback for when the item is clicked for more info.
  */
 class DiceAdapter(
-    private val diceList: List<Dice>,
-    private val onConnectClick: (Dice) -> Unit,
-    private val onInfoClick: (Dice, View) -> Unit
+    private val diceList: List<IDice>,
+    private val onConnectClick: (IDice) -> Unit,
+    private val onInfoClick: (IDice, View) -> Unit,
+    private val isDiceConnected: (IDice) -> Boolean = { dice -> dice.isConnected() }
 ) : RecyclerView.Adapter<DiceAdapter.DiceViewHolder>() {
 
     /**
@@ -87,8 +88,9 @@ class DiceAdapter(
             combine(dice.lastRoll, dice.isStable, dice.color) { roll, stable, color ->
                 Triple(roll, stable, color)
             }.collect { (roll, stable) ->
+                val connected = isDiceConnected(dice)
                 holder.tvState.text = when {
-                    dice.gatt == null -> "Not connected"
+                    !connected -> "Not connected"
                     roll == null -> "No roll"
                     stable == false -> "Rolling..."
                     stable == true -> roll.toString()
@@ -96,8 +98,8 @@ class DiceAdapter(
                 }
 
                 holder.tvColor.text = dice.getColorName()
-                holder.btnConnect.isEnabled = dice.gatt == null
-                holder.btnConnect.text = if (dice.gatt == null) "Connect" else "Connected"
+                holder.btnConnect.isEnabled = !connected
+                holder.btnConnect.text = if (!connected) "Connect" else "Connected"
             }
 
         }

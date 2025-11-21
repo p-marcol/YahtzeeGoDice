@@ -8,7 +8,7 @@ import com.example.godicetest.enums.eDiceNeonColor
 import com.example.godicetest.enums.eDicePattern
 import com.example.godicetest.extensions.setNeonColor
 import com.example.godicetest.extensions.setNeonGlow
-import com.example.godicetest.models.Dice
+import com.example.godicetest.interfaces.IDice
 import com.example.godicetest.views.NeonGridLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,8 +25,8 @@ import org.sample.godicesdklib.GoDiceSDK
  * @return RecyclerView.Adapter for DiceViewHolder.
  */
 class DiceViewAdapter(
-    private val diceList: List<Dice>,
-    private val onDiceClick: (Dice, View) -> Unit
+    private val diceList: List<IDice>,
+    private val onDiceClick: (IDice, View) -> Unit
 ) : RecyclerView.Adapter<DiceViewAdapter.DiceViewHolder>() {
 
     /** ViewHolder for a single Dice item.

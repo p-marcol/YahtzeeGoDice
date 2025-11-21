@@ -21,11 +21,11 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import com.example.godicetest.interfaces.IDice
+import com.example.godicetest.interfaces.IDiceManager
 import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.models.Dice
 import org.sample.godicesdklib.GoDiceSDK
-import java.util.Timer
-import java.util.TimerTask
 
 /**
  * Singleton manager for GoDice devices.
@@ -33,7 +33,7 @@ import java.util.TimerTask
  * This class handles scanning, connecting, and managing multiple GoDice devices.
  * It listens for events from the GoDice SDK and notifies registered listeners about state changes.
  */
-class DiceManager() : GoDiceSDK.Listener {
+class DiceManager() : GoDiceSDK.Listener, IDiceManager {
 
     // region Singleton
 
@@ -122,13 +122,13 @@ class DiceManager() : GoDiceSDK.Listener {
      *
      * @param listener The listener to register.
      */
-    fun addListener(listener: IDiceStateListener) {
+    override fun addListener(listener: IDiceStateListener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener)
         }
     }
 
-    fun removeListener(listener: IDiceStateListener) {
+    override fun removeListener(listener: IDiceStateListener) {
         listeners.remove(listener)
     }
 
@@ -139,7 +139,7 @@ class DiceManager() : GoDiceSDK.Listener {
      * @param onComplete A callback function to be invoked once scanning has started.
      */
     @SuppressLint("MissingPermission")
-    fun startScan(adapter: BluetoothAdapter, onComplete: () -> Unit) {
+    override fun startScan(adapter: BluetoothAdapter, onComplete: () -> Unit) {
         bluetoothScanner = adapter.bluetoothLeScanner
 
         val filters = listOf(
@@ -168,9 +168,13 @@ class DiceManager() : GoDiceSDK.Listener {
      * Connects to the specified Dice device.
      */
     @SuppressLint("MissingPermission")
-    fun connectDice(context: Context, dice: Dice) {
-        if (dice.gatt != null) return // already connected
-        dice.gatt = dice.device.connectGatt(
+    override fun connectDice(context: Context, dice: IDice) {
+        val realDice = dice as? Dice ?: run {
+            Log.w("DiceManager", "Unsupported dice implementation: ${dice::class.java.simpleName}")
+            return
+        }
+        if (realDice.isConnected()) return // already connected
+        val gatt = realDice.device.connectGatt(
             context,
             true,
             object : BluetoothGattCallback() {
@@ -178,42 +182,45 @@ class DiceManager() : GoDiceSDK.Listener {
                     gatt: BluetoothGatt?, status: Int, newState: Int
                 ) {
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
-//                        runOnMainThread { listeners.forEach { it.onStable(dice, 0) } }
-                        dice.onConnected()
+                        realDice.bindGatt(gatt)
+//                        runOnMainThread { listeners.forEach { it.onStable(realDice, 0) } }
+                        realDice.onConnected()
                         runOnMainThread {
-                            listeners.forEach { it.onConnectionChanged(dice, true) }
+                            listeners.forEach { it.onConnectionChanged(realDice, true) }
                         }
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        realDice.closeGatt()
                         runOnMainThread {
-                            listeners.forEach { it.onConnectionChanged(dice, false) }
-                            listeners.forEach { it.onDisconnected(dice) }
+                            listeners.forEach { it.onConnectionChanged(realDice, false) }
+                            listeners.forEach { it.onDisconnected(realDice) }
                         }
                     }
                 }
 
                 override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-                    dice.onServicesDiscovered()
+                    realDice.onServicesDiscovered()
                 }
 
                 override fun onCharacteristicChanged(
                     gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?
                 ) {
-                    dice.onEvent()
+                    realDice.onEvent()
                 }
 
                 override fun onDescriptorWrite(
                     gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int
                 ) {
-                    dice.nextWrite()
+                    realDice.nextWrite()
                 }
 
                 override fun onCharacteristicWrite(
                     gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int
                 ) {
-                    dice.nextWrite()
+                    realDice.nextWrite()
                 }
             }
         )
+        realDice.bindGatt(gatt)
     }
 
     /**
@@ -222,14 +229,14 @@ class DiceManager() : GoDiceSDK.Listener {
      * @param address The Bluetooth address of the Dice device.
      * @return The Dice device if found, or null otherwise.
      */
-    fun getDice(address: String): Dice? = dices[address]
+    override fun getDice(address: String): Dice? = dices[address]
 
     /**
      * Retrieves a list of all discovered Dice devices.
      *
      * @return A list of all Dice devices.
      */
-    fun getAllDice(): List<Dice> = dices.values.toList()
+    override fun getAllDice(): List<Dice> = dices.values.toList()
 
     /**
      * Retrieves a list of Dice devices by their color.
@@ -237,15 +244,17 @@ class DiceManager() : GoDiceSDK.Listener {
      * @param color The color value to filter Dice devices, as defined by GoDiceSDK.
      * @return A list of Dice devices matching the specified color.
      */
-    fun getDiceByColor(color: Int): List<Dice> {
+    override fun getDiceByColor(color: Int): List<Dice> {
         return dices.values.filter { it.color.value == color }
     }
 
-    fun turnOffAllDiceLed() {
+    override fun turnOffAllDiceLed() {
         dices.values.forEach { dice ->
             dice.scheduleWrite(GoDiceSDK.closeToggleLedsPacket())
         }
     }
+
+    override fun isConnected(dice: IDice): Boolean = dice.isConnected()
 
     // endregion
     // region Private Methods
@@ -273,16 +282,11 @@ class DiceManager() : GoDiceSDK.Listener {
         Log.d("DiceManager", "Discovered Dice: Name=$name, Address=$address")
         onNewDiceDetected()
 
-        dice.scheduleWrite(GoDiceSDK.openLedsPacket(0xff0000, 0x00ff00))
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                dice.scheduleWrite(GoDiceSDK.closeToggleLedsPacket())
-            }
-        }, 3000)
+        dice.blinkLed(0xff0000, 0.2f, 0.2f, 2)
         dice.scheduleWrite(GoDiceSDK.getColorPacket())
         dice.scheduleWrite(GoDiceSDK.getChargeLevelPacket())
 
-        dice.gatt = null // reset GATT to allow reconnection
+        dice.bindGatt(null) // reset GATT to allow reconnection
     }
 
     /** Runs the provided runnable on the main UI thread.

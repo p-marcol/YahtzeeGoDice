@@ -1,19 +1,17 @@
 package com.example.godicetest.interfaces
 
-import com.example.godicetest.models.Dice
-
 /**
  * Interface for listening to state changes in a Dice object.
  */
 interface IDiceStateListener {
-    fun onColorChanged(dice: Dice, color: Int)
-    fun onStable(dice: Dice, face: Int)
-    fun onRolling(dice: Dice)
-    fun onChargingChanged(dice: Dice, charging: Boolean)
-    fun onChargeLevel(dice: Dice, level: Int)
-    fun onDisconnected(dice: Dice)
+    fun onColorChanged(dice: IDice, color: Int)
+    fun onStable(dice: IDice, face: Int)
+    fun onRolling(dice: IDice)
+    fun onChargingChanged(dice: IDice, charging: Boolean)
+    fun onChargeLevel(dice: IDice, level: Int)
+    fun onDisconnected(dice: IDice)
     fun onNewDiceDetected()
-    fun onConnectionChanged(dice: Dice, connected: Boolean)
+    fun onConnectionChanged(dice: IDice, connected: Boolean)
     fun onLog(msg: String) {}
 }
 
