@@ -20,6 +20,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    flavorDimensions += "mode"
+
+    productFlavors {
+        create("real") {
+            dimension = "mode"
+            buildConfigField("Boolean", "USE_MOCK_DICE", "false")
+        }
+        create("mock") {
+            dimension = "mode"
+            buildConfigField("Boolean", "USE_MOCK_DICE", "true")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -27,6 +40,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
     compileOptions {
@@ -38,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
