@@ -6,6 +6,7 @@ import com.example.godicetest.interfaces.IDice
 import com.example.godicetest.interfaces.IDiceManager
 import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.models.MockDice
+import com.example.godicetest.utils.ShakeDetector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -31,17 +32,37 @@ class MockDiceManager private constructor() : IDiceManager {
     private val listeners = mutableSetOf<IDiceStateListener>()
     private val diceList = mutableListOf<MockDice>()
 
+    private val shakeDetector = ShakeDetector
+
     private var initialized = false
+    private var shakeInitialized = false
 
     private fun initialize(count: Int = 6) {
         if (initialized) return
 
         initialized = true
+
         repeat(count) { index ->
             val mockDice = MockDice(index).apply {
                 mockAddress = "MOCK:$index"
             }
             diceList.add(mockDice)
+        }
+    }
+
+    private fun initializeShake(context: Context) {
+        if (shakeInitialized) return
+
+        shakeInitialized = true
+
+        shakeDetector.start(context.applicationContext)
+
+        shakeDetector.onShake = {
+            diceList.forEach { mockDice ->
+                listeners.forEach { it.onRolling(mockDice) }
+                mockDice.roll()
+                listeners.forEach { it.onStable(mockDice, mockDice.lastRoll.value!!) }
+            }
         }
     }
 
@@ -70,6 +91,12 @@ class MockDiceManager private constructor() : IDiceManager {
         context: Context,
         dice: IDice
     ) {
+        initializeShake(context)
+
+        if (!initialized) {
+            initialize()
+        }
+
         val found = diceList.find { it.id == dice.id } ?: return
         found.connect()
         listeners.forEach { it.onConnectionChanged(found, true) }

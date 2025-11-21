@@ -29,21 +29,13 @@ class MockDice(override val id: Int) : IDice {
     override fun getDieName(): String = "Mock $id"
 
     override fun isConnected(): Boolean = connected
-    override fun onConnected() {
-        TODO("Not yet implemented")
-    }
+    override fun onConnected() {}
 
-    override fun onServicesDiscovered() {
-        TODO("Not yet implemented")
-    }
+    override fun onServicesDiscovered() {}
 
-    override fun onEvent() {
-        TODO("Not yet implemented")
-    }
+    override fun onEvent() {}
 
-    override fun nextWrite() {
-        TODO("Not yet implemented")
-    }
+    override fun nextWrite() {}
 
     fun connect() {
         connected = true
