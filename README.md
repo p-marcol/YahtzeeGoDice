@@ -1,5 +1,11 @@
 # YahtzeeGoDice
 
+![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white)
+![Build Flavors](https://img.shields.io/badge/Flavors-real%20%7C%20mock-blue)
+![Silesian University of Technology](https://img.shields.io/badge/University-Silesian%20University%20of%20Technology-0057B8)
+![2025](https://img.shields.io/badge/Year-2025-orange)
+
 **YahtzeeGoDice** is a mobile application that brings the classic game **Yahtzee** to life using physical **GoDice** smart dice.  
 The app uses Bluetooth Low Energy to connect with GoDice and react to real dice rolls in real-time.
 
