@@ -11,7 +11,7 @@ import com.example.godicetest.models.Dice
  * @property displayNameRes Resource ID for the display name of the combination.
  */
 enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
-    // region Combination names
+    //region Combination names
     ONES(R.string.ones),
     TWOS(R.string.twos),
     THREES(R.string.threes),
@@ -26,8 +26,8 @@ enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
     YAHTZEE(R.string.yahtzee),
     CHANCE(R.string.chance);
 
-    // endregion
-    // region Public Methods
+    //endregion
+    //region Public Methods
 
     /**
      * Gets the display name of the combination.
@@ -108,8 +108,8 @@ enum class eYahtzeeCombination(@StringRes val displayNameRes: Int) {
         }
     }
 
-    // endregion
-    // region Private Methods
+    //endregion
+    //region Private Methods
 
     /**
      * Checks if the dice contain a straight of the specified length.

@@ -4,6 +4,7 @@ package com.example.godicetest.interfaces
  * Interface for listening to state changes in a Dice object.
  */
 interface IDiceStateListener {
+    //region Callbacks
     fun onColorChanged(dice: IDice, color: Int)
     fun onStable(dice: IDice, face: Int)
     fun onRolling(dice: IDice)
@@ -13,6 +14,7 @@ interface IDiceStateListener {
     fun onNewDiceDetected()
     fun onConnectionChanged(dice: IDice, connected: Boolean)
     fun onLog(msg: String) {}
+    //endregion
 }
 
 // IDiceStateListener.kt finished.

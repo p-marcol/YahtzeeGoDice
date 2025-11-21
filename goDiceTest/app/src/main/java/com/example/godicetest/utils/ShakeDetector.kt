@@ -9,17 +9,32 @@ import android.widget.Toast
 import java.lang.ref.WeakReference
 import kotlin.math.sqrt
 
+/**
+ * Global shake detector singleton.
+ * Uses accelerometer to detect shaking and trigger a callback.
+ */
 object ShakeDetector : SensorEventListener {
 
+    //region Constants
+
     private const val SHAKE_THRESHOLD = 18f
-    private const val SHATE_TIME_MS = 500
+    private const val SHAKE_TIME_MS = 500
+
+    //endregion
+    //region Fields
 
     private var lastShakeTime = 0L
     private var sensorManager: SensorManager? = null
 
     private var ctxRef: WeakReference<Context>? = null
 
+    /**
+     * Callback executed when a shake is detected.
+     */
     var onShake: (() -> Unit)? = null
+
+    //endregion
+    //region Public API
 
     fun start(context: Context) {
         val appCtx = context.applicationContext
@@ -37,6 +52,9 @@ object ShakeDetector : SensorEventListener {
         ctxRef = null
     }
 
+    //endregion
+    //region Sensor Callbacks
+
     override fun onSensorChanged(event: SensorEvent?) {
         if (event == null) return
 
@@ -45,7 +63,7 @@ object ShakeDetector : SensorEventListener {
 
         if (magnitude > SHAKE_THRESHOLD) {
             val now = System.currentTimeMillis()
-            if (now - lastShakeTime > SHATE_TIME_MS) {
+            if (now - lastShakeTime > SHAKE_TIME_MS) {
                 lastShakeTime = now
                 ctxRef?.get()?.let { ctx ->
                     Toast.makeText(ctx, "Shake detected", Toast.LENGTH_SHORT).show()
@@ -56,4 +74,6 @@ object ShakeDetector : SensorEventListener {
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
+
+    //endregion
 }

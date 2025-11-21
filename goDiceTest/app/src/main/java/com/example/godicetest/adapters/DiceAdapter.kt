@@ -31,6 +31,7 @@ class DiceAdapter(
     private val isDiceConnected: (IDice) -> Boolean = { dice -> dice.isConnected() }
 ) : RecyclerView.Adapter<DiceAdapter.DiceViewHolder>() {
 
+    //region ViewHolder
     /**
      * ViewHolder class for Dice items.
      * @param itemView The view representing a single Dice item.
@@ -42,9 +43,9 @@ class DiceAdapter(
         val btnConnect: Button = itemView.findViewById(R.id.btnConnect)
         val root: View = itemView
     }
+    //endregion
 
-    // region RecyclerView.Adapter methods
-
+    //region RecyclerView.Adapter methods
     /**
      * Creates a new ViewHolder for a Dice item.
      *
@@ -107,7 +108,7 @@ class DiceAdapter(
         holder.itemView.tag = job
     }
 
-    // endregion
+    //endregion
 }
 
 // DiceAdapter.kt complete.

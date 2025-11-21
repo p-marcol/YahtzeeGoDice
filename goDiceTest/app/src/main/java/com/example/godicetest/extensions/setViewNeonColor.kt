@@ -10,6 +10,7 @@ import androidx.core.graphics.toColorInt
  *
  * @param colorHex The color in hexadecimal format (e.g., "#FF00FF").
  */
+//region Neon color
 fun View.setNeonColor(
     colorHex: String
 ) {
@@ -21,6 +22,7 @@ fun View.setNeonColor(
         this.background = wrapped
     }
 }
+//endregion
 
 // setNeonColor.kt complete.
 // The view glows. One dot, one spark, one devilish touch.

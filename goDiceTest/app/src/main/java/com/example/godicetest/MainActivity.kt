@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("MissingPermission")
 class MainActivity : AppCompatActivity() {
 
+    //region Properties
     private lateinit var diceManager: IDiceManager
     private lateinit var recyclerView: RecyclerView
     private lateinit var diceAdapter: DiceAdapter
@@ -41,50 +42,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var diceViewer: RecyclerView
     private lateinit var diceViewAdapter: DiceViewAdapter
     private lateinit var diceSelector: DiceSelector
+    //endregion
 
-    /**
-     * Shows a popover with dice information and controls.
-     *
-     * @param anchor The view to anchor the popover to.
-     * @param dice The dice object to display information for.
-     */
-    private fun showDicePopover(anchor: View, dice: IDice) {
-        val inflater = LayoutInflater.from(anchor.context)
-        val popupView = inflater.inflate(R.layout.popover_dice, null)
-
-        val popup = PopupWindow(
-            popupView,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            true
-        )
-
-        popup.isOutsideTouchable = true
-        popup.elevation = 10f
-
-        val tvName = popupView.findViewById<TextView>(R.id.tvDiceName)
-        val tvBattery = popupView.findViewById<TextView>(R.id.tvBattery)
-        val btnLedOn = popupView.findViewById<Button>(R.id.btnLedOn)
-        val btnLedOff = popupView.findViewById<Button>(R.id.btnLedOff)
-
-        tvName.text = dice.getDieName() ?: "Dice ${dice.id}"
-
-        btnLedOn.setOnClickListener { dice.setLed(true) }
-        btnLedOff.setOnClickListener { dice.setLed(false) }
-
-        (anchor.context as? AppCompatActivity)?.lifecycleScope?.launch {
-            launch {
-                dice.batteryLevel.collect { level ->
-                    val chargingText = if (dice.isCharging.value) " (Charging)" else ""
-                    tvBattery.text = "Battery: $level%$chargingText"
-                }
-            }
-        }
-
-        // pokaż nad anchorem
-        popup.showAsDropDown(anchor, 0, -anchor.height)
-    }
-
+    //region Lifecycle
     /**
      * Called when the activity is created.
      *
@@ -208,7 +168,9 @@ class MainActivity : AppCompatActivity() {
             startDiceSelection()
         }
     }
+    //endregion
 
+    //region UI helpers
     /**
      * Starts the dice selection process.
      */
@@ -248,7 +210,54 @@ class MainActivity : AppCompatActivity() {
         diceViewer.adapter = diceViewAdapter
         Log.d("DiceList", "Dice list updated")
     }
+    //endregion
 
+    //region Popovers
+    /**
+     * Shows a popover with dice information and controls.
+     *
+     * @param anchor The view to anchor the popover to.
+     * @param dice The dice object to display information for.
+     */
+    private fun showDicePopover(anchor: View, dice: IDice) {
+        val inflater = LayoutInflater.from(anchor.context)
+        val popupView = inflater.inflate(R.layout.popover_dice, null)
+
+        val popup = PopupWindow(
+            popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
+
+        popup.isOutsideTouchable = true
+        popup.elevation = 10f
+
+        val tvName = popupView.findViewById<TextView>(R.id.tvDiceName)
+        val tvBattery = popupView.findViewById<TextView>(R.id.tvBattery)
+        val btnLedOn = popupView.findViewById<Button>(R.id.btnLedOn)
+        val btnLedOff = popupView.findViewById<Button>(R.id.btnLedOff)
+
+        tvName.text = dice.getDieName() ?: "Dice ${dice.id}"
+
+        btnLedOn.setOnClickListener { dice.setLed(true) }
+        btnLedOff.setOnClickListener { dice.setLed(false) }
+
+        (anchor.context as? AppCompatActivity)?.lifecycleScope?.launch {
+            launch {
+                dice.batteryLevel.collect { level ->
+                    val chargingText = if (dice.isCharging.value) " (Charging)" else ""
+                    tvBattery.text = "Battery: $level%$chargingText"
+                }
+            }
+        }
+
+        // pokaż nad anchorem
+        popup.showAsDropDown(anchor, 0, -anchor.height)
+    }
+    //endregion
+
+    //region Logging
     /**
      * Appends a log message to the text view.
      *
@@ -260,6 +269,7 @@ class MainActivity : AppCompatActivity() {
             scrollView.fullScroll(ScrollView.FOCUS_DOWN)
         }
     }
+    //endregion
 }
 
 // End of MainActivity.kt.

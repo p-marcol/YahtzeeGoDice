@@ -27,23 +27,23 @@ import java.util.UUID
  */
 @SuppressLint("MissingPermission")
 class Dice(override val id: Int, override val device: BluetoothDevice) : IDice {
-    // region Bluetooth GATT variables
+    //region Bluetooth GATT variables
     private var gatt: BluetoothGatt? = null
     private var service: BluetoothGattService? = null
     private var writeChar: BluetoothGattCharacteristic? = null
     private var readChar: BluetoothGattCharacteristic? = null
     private var writes: Queue<ByteArray> = LinkedList()
 
-    // endregion
-    // region properties
+    //endregion
+    //region properties
     private var writeInProgress = false
     private var dieName = device.name
     override var color = MutableStateFlow<Int?>(null)
     override var batteryLevel = MutableStateFlow<Int>(0)
     override var isCharging = MutableStateFlow<Boolean>(false)
 
-    // endregion
-    // region IDice
+    //endregion
+    //region IDice
 
     override var lastRoll = MutableStateFlow<Int?>(null)
     override var isStable = MutableStateFlow<Boolean?>(true)
@@ -52,8 +52,8 @@ class Dice(override val id: Int, override val device: BluetoothDevice) : IDice {
         // No-op: roll is handled via notifications from the die
     }
 
-    // endregion
-    // region getters and setters
+    //endregion
+    //region getters and setters
 
     /**
      * Returns the name of the die, or null if not available.
@@ -124,8 +124,8 @@ class Dice(override val id: Int, override val device: BluetoothDevice) : IDice {
         return gatt != null
     }
 
-    // endregion
-    // region Bluetooth GATT handling
+    //endregion
+    //region Bluetooth GATT handling
 
     /**
      * Called when the die is connected.
@@ -156,8 +156,8 @@ class Dice(override val id: Int, override val device: BluetoothDevice) : IDice {
         }
     }
 
-    // endregion
-    // region Data handling
+    //endregion
+    //region Data handling
 
     /**
      * Starts sending initialization packets to the die. Fetches the color and sends the initialization packet.
@@ -257,8 +257,8 @@ class Dice(override val id: Int, override val device: BluetoothDevice) : IDice {
         }, 1000)
     }
 
-    // endregion
-    // region UUIDs
+    //endregion
+    //region UUIDs
 
     /** UUIDs for the GoDice service and characteristics */
     companion object {

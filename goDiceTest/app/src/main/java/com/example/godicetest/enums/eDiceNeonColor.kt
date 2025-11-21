@@ -11,6 +11,7 @@ enum class eDiceNeonColor(
     val hexCode: String,
     val intColor: Int = hexCode.toColorInt()
 ) {
+    //region Entries
     Black("#FFFFFF"),
     Red("#FF0100"),
     Green("#00FF0D"),
@@ -18,6 +19,7 @@ enum class eDiceNeonColor(
     Yellow("#FFE300"),
     Orange("#FF5C00"),
     Unknown("#808080")
+    //endregion
 }
 
 // End of eDiceNeonColor.kt.

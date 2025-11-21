@@ -13,6 +13,7 @@ package com.example.godicetest.enums
  * ```
  */
 enum class eDicePattern(val pattern: List<Boolean>) {
+    //region Patterns
     Dice_0(
         listOf(
             false, false, false,
@@ -62,6 +63,7 @@ enum class eDicePattern(val pattern: List<Boolean>) {
             true, false, true
         )
     ),
+    //endregion
 }
 
 // End of eDicePattern.kt.

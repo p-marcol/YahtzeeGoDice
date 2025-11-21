@@ -13,6 +13,7 @@ import org.sample.godicesdklib.GoDiceSDK
  * @param id The unique identifier for the mock dice.
  */
 class MockDice(override val id: Int) : IDice {
+    //region State
     override val lastRoll = MutableStateFlow<Int?>(null)
     override val isStable = MutableStateFlow<Boolean?>(true)
     override val color = MutableStateFlow<Int?>(GoDiceSDK.DICE_BLUE)
@@ -25,16 +26,17 @@ class MockDice(override val id: Int) : IDice {
     var mockAddress: String = "MOCK:$id"
 
     private var connected = false
+    //endregion
 
+    //region Identity
     override fun getDieName(): String = "Mock $id"
+    //endregion
 
+    //region Connection lifecycle
     override fun isConnected(): Boolean = connected
     override fun onConnected() {}
-
     override fun onServicesDiscovered() {}
-
     override fun onEvent() {}
-
     override fun nextWrite() {}
 
     fun connect() {
@@ -46,7 +48,9 @@ class MockDice(override val id: Int) : IDice {
         connected = false
         Log.d("MockDice", "Mock dice $id disconnected.")
     }
+    //endregion
 
+    //region Dice behavior
     /**
      * Simulates rolling the mock dice.
      */
@@ -69,7 +73,9 @@ class MockDice(override val id: Int) : IDice {
         blinks: Int
     ) {
     }
+    //endregion
 
+    //region Dice info
     override fun getDicePattern(): List<Boolean> {
         return when (lastRoll.value) {
             1 -> eDicePattern.Dice_1.pattern
@@ -92,6 +98,7 @@ class MockDice(override val id: Int) : IDice {
             else -> "Unknown"
         }
     }
+    //endregion
 }
 
 // End of MockDice.kt.

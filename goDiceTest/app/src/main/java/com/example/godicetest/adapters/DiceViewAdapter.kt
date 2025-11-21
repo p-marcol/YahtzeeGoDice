@@ -29,6 +29,7 @@ class DiceViewAdapter(
     private val onDiceClick: (IDice, View) -> Unit
 ) : RecyclerView.Adapter<DiceViewAdapter.DiceViewHolder>() {
 
+    //region ViewHolder
     /** ViewHolder for a single Dice item.
      *
      * @param itemView The view representing a single dice item.
@@ -48,9 +49,9 @@ class DiceViewAdapter(
             itemView.findViewById(R.id.cell_22)
         )
     }
+    //endregion
 
-    // region RecyclerView.Adapter methods
-
+    //region RecyclerView.Adapter methods
     /** Creates a new DiceViewHolder.
      *
      * @param parent The parent ViewGroup.
@@ -117,8 +118,10 @@ class DiceViewAdapter(
     }
 
     override fun getItemCount(): Int = diceList.size
+    //endregion
 }
 
+//region Color helpers
 /**
  * Returns the hexadecimal color code for the given dice color.
  *
@@ -136,5 +139,6 @@ fun getColorHex(color: Int): String {
         else -> eDiceNeonColor.Unknown.hexCode
     }
 }
+//endregion
 
 // End of adapter. Luck’s a fiery mistress tonight.

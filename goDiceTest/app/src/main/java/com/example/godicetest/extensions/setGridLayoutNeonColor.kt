@@ -15,6 +15,7 @@ import com.example.godicetest.R
  * @param strokeWidth The width of the stroke around the GridLayout.
  * @param glowRadii The list of radii for the glow effect.
  */
+//region Neon glow
 fun GridLayout.setNeonGlow(
     colorHex: String,
     strokeWidth: Int = 8,
@@ -35,5 +36,6 @@ fun GridLayout.setNeonGlow(
     this.elevation = 10f
     this.translationZ = 10f
 }
+//endregion
 
 // GridLayout set. The devil rearranges the dots while you blink.

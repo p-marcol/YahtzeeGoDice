@@ -18,21 +18,21 @@ class DiceSelector(
     private val onSelectionConfirmed: (List<IDice>) -> Unit
 ) : IDiceStateListener {
 
-    // region Properties
+    //region Properties
 
     private val selectedDice = mutableSetOf<IDice>()
     private var ready = false
 
-    // endregion
-    // region Initialization
+    //endregion
+    //region Initialization
 
     init {
         manager.addListener(this)
         Log.d("Selection", "Selection button clicked with count: ${requiredCount}")
     }
 
-    // endregion
-    // region Public Methods
+    //endregion
+    //region Public Methods
 
     /**
      * Confirms the selection of dice if user is ready.
@@ -44,8 +44,8 @@ class DiceSelector(
         }
     }
 
-    // endregion
-    // region Private Methods
+    //endregion
+    //region Private Methods
 
     /**
      * Signals that the selection is ready by blinking the LEDs of the selected dice.
@@ -57,8 +57,8 @@ class DiceSelector(
         }
     }
 
-    // endregion
-    // region IDiceStateListener implementation
+    //endregion
+    //region IDiceStateListener implementation
 
     /**
      * Called when a die becomes stable.
@@ -98,4 +98,5 @@ class DiceSelector(
     override fun onNewDiceDetected() {}
 
     override fun onConnectionChanged(dice: IDice, connected: Boolean) {}
+    //endregion
 }

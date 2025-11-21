@@ -14,8 +14,20 @@ import java.lang.ref.WeakReference
  * Helper methods to request Bluetooth and runtime permissions.
  */
 object PermissionsHelper {
+    //region State
     var activity: WeakReference<Activity> = WeakReference(null)
 
+    /**
+     * Callback to be invoked when permissions are granted.
+     *
+     * @param permissions The array of permissions requested.
+     * @param grantResults The results for the corresponding permissions.
+     */
+    var permissionsGrantedCallback: ((permissions: Array<String>, grantResults: IntArray) -> Unit)? =
+        null
+    //endregion
+
+    //region Public API
     /**
      * Requests necessary permissions for Bluetooth operations.
      *
@@ -55,7 +67,9 @@ object PermissionsHelper {
             completion()
         }
     }
+    //endregion
 
+    //region Validation
     /**
      * Checks for any missing manifest permissions.
      *
@@ -85,16 +99,9 @@ object PermissionsHelper {
             missing
         }
     }
+    //endregion
 
-    /**
-     * Callback to be invoked when permissions are granted.
-     *
-     * @param permissions The array of permissions requested.
-     * @param grantResults The results for the corresponding permissions.
-     */
-    var permissionsGrantedCallback: ((permissions: Array<String>, grantResults: IntArray) -> Unit)? =
-        null
-
+    //region Helpers
     /**
      * Checks if BLE is supported on the device.
      *
@@ -106,6 +113,7 @@ object PermissionsHelper {
         }
         return true
     }
+    //endregion
 }
 
 // PermissionsHelper.kt ends here.

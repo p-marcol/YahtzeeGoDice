@@ -18,6 +18,7 @@ class NeonGridLayout @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : GridLayout(context, attrs, defStyleAttr) {
 
+    //region Paint configuration
     /** Paint object for drawing the neon glow effect. */
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -28,7 +29,9 @@ class NeonGridLayout @JvmOverloads constructor(
     private val rect = RectF()
 
     private var cornerRadius = 24f
+    //endregion
 
+    //region Customization
     /** Sets the neon color of the grid layout.
      * @param colorHex The color in hexadecimal format (e.g., "#FF00FF").
      */
@@ -44,7 +47,9 @@ class NeonGridLayout @JvmOverloads constructor(
         cornerRadius = radius
         invalidate()
     }
+    //endregion
 
+    //region Drawing
     /**
      * Draws the neon glow effect around the grid layout.
      *
@@ -56,6 +61,7 @@ class NeonGridLayout @JvmOverloads constructor(
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
     }
 
+    //endregion
 }
 
 // NeonGridLayout.kt finished.

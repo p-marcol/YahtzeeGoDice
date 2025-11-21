@@ -15,6 +15,7 @@ import androidx.core.graphics.toColorInt
  * @param paddingDp The padding in dp to apply to the Button.
  * @param glowRadii The list of radii for the glow effect.
  */
+//region Neon glow
 fun Button.setNeonGlow(
     colorHex: String,
     strokeWidth: Int = 4,
@@ -49,6 +50,7 @@ fun Button.setNeonGlow(
         )
     }
 }
+//endregion
 
 // setNeonGlow.kt finished.
 // Your fingers are safe… but the neon might bite.

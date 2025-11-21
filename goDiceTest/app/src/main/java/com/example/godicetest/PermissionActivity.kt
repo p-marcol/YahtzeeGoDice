@@ -16,6 +16,7 @@ import android.os.Bundle
 @SuppressLint("MissingPermission")
 class PermissionsActivity : Activity() {
 
+    //region Lifecycle
     /**
      * Called when the activity is created.
      */
@@ -36,7 +37,9 @@ class PermissionsActivity : Activity() {
             bluetoothReplied()
         }
     }
+    //endregion
 
+    //region Permission flow
     /**
      * Called when Bluetooth enabling request is replied.
      * @see checkPermissions
@@ -70,7 +73,9 @@ class PermissionsActivity : Activity() {
         }
         finish()
     }
+    //endregion
 
+    //region Activity callbacks
     /**
      * Called when an activity you launched exits, giving you the requestCode you started it with,
      * the resultCode it returned, and any additional data from it.
@@ -97,11 +102,13 @@ class PermissionsActivity : Activity() {
             permissionsReplied(permissions, grantResults)
         }
     }
+    //endregion
 
     /**
      * Companion object to hold static members.
      */
     companion object {
+        //region Constants & factories
         private const val BLUETOOTH_ENABLE_REQUEST_CODE = 0x1ffff
         private const val PERMISSIONS_REQUEST_CODE = 0x2ffff
         private const val PERMISSIONS_KEY = "PERMISSIONS_KEY"
@@ -133,6 +140,7 @@ class PermissionsActivity : Activity() {
                 activity.startActivity(intent)
             }
         }
+        //endregion
     }
 }
 

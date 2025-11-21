@@ -35,7 +35,7 @@ import org.sample.godicesdklib.GoDiceSDK
  */
 class DiceManager() : GoDiceSDK.Listener, IDiceManager {
 
-    // region Singleton
+    //region Singleton
 
     /**
      * Retrieves the singleton instance of the DiceManager.
@@ -53,8 +53,8 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
         }
     }
 
-    // endregion
-    // region Properties
+    //endregion
+    //region Properties
 
     private var bluetoothScanner: BluetoothLeScanner? = null
     private var scanCallback: ScanCallback? = null
@@ -63,8 +63,8 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
 
     private val listeners = mutableListOf<IDiceStateListener>()
 
-    // endregion
-    // region Initialization
+    //endregion
+    //region Initialization
 
     /**
      * Initializes the GoDice SDK listener.
@@ -114,8 +114,8 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
         }
     }
 
-    // endregion
-    // region Public Methods
+    //endregion
+    //region Public Methods
 
     /**
      * Registers a listener to receive dice state updates.
@@ -256,8 +256,8 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
 
     override fun isConnected(dice: IDice): Boolean = dice.isConnected()
 
-    // endregion
-    // region Private Methods
+    //endregion
+    //region Private Methods
 
     /**
      * Handles a scan result from the Bluetooth LE scanner.
@@ -306,8 +306,8 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
         listeners.forEach { it.onNewDiceDetected() }
     }
 
-    // endregion
-    // region GoDiceSDK.Listener implementations
+    //endregion
+    //region GoDiceSDK.Listener implementations
 
     /**
      * Called when a Dice returns its color value.
@@ -370,7 +370,7 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
         listeners.forEach { it.onChargeLevel(dice, level) }
     }
 
-    // endregion
+    //endregion
 }
 
 // DiceManager.kt closed.

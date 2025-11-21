@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
  */
 class MockDiceManager private constructor() : IDiceManager {
 
+    //region Singleton
     companion object {
         @Volatile
         private var INSTANCE: MockDiceManager? = null
@@ -27,7 +28,9 @@ class MockDiceManager private constructor() : IDiceManager {
             }
         }
     }
+    //endregion
 
+    //region State
     private val scope = CoroutineScope(Dispatchers.Default)
     private val listeners = mutableSetOf<IDiceStateListener>()
     private val diceList = mutableListOf<MockDice>()
@@ -36,7 +39,9 @@ class MockDiceManager private constructor() : IDiceManager {
 
     private var initialized = false
     private var shakeInitialized = false
+    //endregion
 
+    //region Initialization
     private fun initialize(count: Int = 6) {
         if (initialized) return
 
@@ -65,7 +70,9 @@ class MockDiceManager private constructor() : IDiceManager {
             }
         }
     }
+    //endregion
 
+    //region Listener management
     override fun addListener(listener: IDiceStateListener) {
         listeners.add(listener)
     }
@@ -73,7 +80,9 @@ class MockDiceManager private constructor() : IDiceManager {
     override fun removeListener(listener: IDiceStateListener) {
         listeners.remove(listener)
     }
+    //endregion
 
+    //region Dice discovery & connections
     override fun startScan(
         adapter: BluetoothAdapter,
         onComplete: () -> Unit
@@ -101,7 +110,9 @@ class MockDiceManager private constructor() : IDiceManager {
         found.connect()
         listeners.forEach { it.onConnectionChanged(found, true) }
     }
+    //endregion
 
+    //region Dice queries
     override fun getDice(address: String): IDice? {
         return diceList.find { it.mockAddress == address }
     }
@@ -117,4 +128,5 @@ class MockDiceManager private constructor() : IDiceManager {
     }
 
     override fun isConnected(dice: IDice): Boolean = dice.isConnected()
+    //endregion
 }
