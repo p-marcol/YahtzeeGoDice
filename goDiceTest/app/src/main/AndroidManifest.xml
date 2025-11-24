@@ -22,6 +22,8 @@
             android:name=".PermissionsActivity"
             android:exported="false" />
 
+        <activity android:name=".activities.GameActivity" />
+
 
         <activity
             android:name=".MainActivity"

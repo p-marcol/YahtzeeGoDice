@@ -5,6 +5,7 @@ package com.example.godicetest
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,8 +19,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.godicetest.activities.GameActivity
 import com.example.godicetest.adapters.DiceViewAdapter
 import com.example.godicetest.extensions.setNeonColor
+import com.example.godicetest.extensions.setNeonGlow
 import com.example.godicetest.interfaces.IDice
 import com.example.godicetest.interfaces.IDiceManager
 import com.example.godicetest.interfaces.IDiceStateListener
@@ -147,12 +150,14 @@ class MainActivity : AppCompatActivity() {
 
         val scanButton = findViewById<Button>(R.id.scanButton)
         val diceSelection = findViewById<LinearLayout>(R.id.diceSelection)
+        val gotoGameBtn = findViewById<Button>(R.id.goto_game)
         scanButton.setNeonColor("#FF00FF")
 
         scanButton.setOnClickListener {
             it.isEnabled = false
             it.visibility = View.GONE
             diceSelection.visibility = View.VISIBLE
+            gotoGameBtn.visibility = View.VISIBLE
             val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
             val adapter = bluetoothManager.adapter
             PermissionsHelper.requestPermissions(this, adapter) {
@@ -167,6 +172,16 @@ class MainActivity : AppCompatActivity() {
         selectButton.setOnClickListener {
             startDiceSelection()
         }
+
+        gotoGameBtn.setNeonGlow("#FFFF00")
+
+        gotoGameBtn.setOnClickListener {
+            val intent = Intent(this, GameActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+//            finish()
+        }
+
     }
     //endregion
 

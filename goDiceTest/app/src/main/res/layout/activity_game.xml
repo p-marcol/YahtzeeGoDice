@@ -8,15 +8,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:flow_horizontalGap="3dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:flow_horizontalGap="3dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -31,16 +29,88 @@
                 android:text="0" />
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/diceViewer"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            app:flow_horizontalGap="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:orientation="vertical">
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/ones" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/twos" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/threes" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/fours" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/fives" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/sixes" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/three_of_a_kind" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/four_of_a_kind" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/full_House" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/small_Straight" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/large_Straight" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/yahtzee" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/chance" />
+
+        </LinearLayout>
 
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/diceViewer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        app:flow_horizontalGap="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

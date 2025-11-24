@@ -66,7 +66,7 @@ object ShakeDetector : SensorEventListener {
             if (now - lastShakeTime > SHAKE_TIME_MS) {
                 lastShakeTime = now
                 ctxRef?.get()?.let { ctx ->
-                    Toast.makeText(ctx, "Shake detected", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(ctx, "🎲 Roll", Toast.LENGTH_SHORT).show()
                 }
                 onShake?.invoke()
             }
