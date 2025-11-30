@@ -29,77 +29,133 @@
                 android:text="0" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <GridLayout
+            android:id="@+id/diceGrid"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:columnCount="2"
+            android:alignmentMode="alignMargins"
+            android:rowOrderPreserved="true"
+            android:padding="8dp"
+            android:useDefaultMargins="true">
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/ones"
+                android:layout_column="0"
+                android:layout_row="0"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/twos"
+                android:layout_column="0"
+                android:layout_row="1"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/threes"
+                android:layout_column="0"
+                android:layout_row="2"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/fours"
+                android:layout_column="0"
+                android:layout_row="3"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/fives"
+                android:layout_column="0"
+                android:layout_row="4"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/sixes"
+                android:layout_column="0"
+                android:layout_row="5"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/three_of_a_kind"
+                android:layout_column="1"
+                android:layout_row="0"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/four_of_a_kind"
+                android:layout_column="1"
+                android:layout_row="1"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/full_House"
+                android:layout_column="1"
+                android:layout_row="2"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/small_Straight"
+                android:layout_column="1"
+                android:layout_row="3"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/large_Straight"
+                android:layout_column="1"
+                android:layout_row="4"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
+
+            <com.example.godicetest.views.DiceSet
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:title="@string/yahtzee"
+                android:layout_column="1"
+                android:layout_row="5"
+                android:layout_columnWeight="1"
+                android:layout_columnSpan="1" />
 
             <com.example.godicetest.views.DiceSet
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/ones" />
+                app:title="@string/chance"
+                android:layout_column="0"
+                android:layout_row="6"
+                android:layout_columnSpan="2" />
 
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/twos" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/threes" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/fours" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/fives" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/sixes" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/three_of_a_kind" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/four_of_a_kind" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/full_House" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/small_Straight" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/large_Straight" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/yahtzee" />
-
-            <com.example.godicetest.views.DiceSet
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/chance" />
-
-        </LinearLayout>
+        </GridLayout>
 
     </LinearLayout>
 

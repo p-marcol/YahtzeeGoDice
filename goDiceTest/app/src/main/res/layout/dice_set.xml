@@ -3,11 +3,23 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:text="@string/set_name_title"
         android:textStyle="bold"
         android:textSize="18sp"
         android:textColor="@android:color/white" />
-    
+
+    <LinearLayout
+        android:id="@+id/diceContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+        <!-- Dice views will be added here dynamically -->
+    </LinearLayout>
 </merge>

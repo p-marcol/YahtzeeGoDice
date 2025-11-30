@@ -19,11 +19,12 @@ import com.example.godicetest.R
 fun GridLayout.setNeonGlow(
     colorHex: String,
     strokeWidth: Int = 8,
-    glowRadii: List<Float> = listOf(2f, 4f, 8f, 16f)
+    glowRadii: List<Float> = listOf(2f, 4f, 8f, 16f),
+    strokeDrawable: Int = R.drawable.stroke_bg
 ) {
     val color = colorHex.toColorInt()
 
-    val bg = ContextCompat.getDrawable(context, R.drawable.stroke_bg)?.mutate()
+    val bg = ContextCompat.getDrawable(context, strokeDrawable)?.mutate()
     if (bg is GradientDrawable) {
         bg.setColor(0x00000000) // Transparent background
         bg.setStroke(strokeWidth, color)
