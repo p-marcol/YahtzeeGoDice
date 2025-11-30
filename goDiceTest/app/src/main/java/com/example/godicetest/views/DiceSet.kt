@@ -22,8 +22,10 @@ class DiceSet @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle) {
 
     private val titleView: TextView
+    private val scoreView: TextView
     private val diceContainer: LinearLayout
     private val diceSlots = mutableListOf<DiceSlot>()
+    private var facesLocked = false
 
     private data class DiceSlot(
         val grid: NeonGridLayout,
@@ -37,10 +39,15 @@ class DiceSet @JvmOverloads constructor(
         private const val DICE_COUNT = 5
     }
 
+    fun unlockFaces() {
+        facesLocked = false
+    }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.dice_set, this, true)
         orientation = VERTICAL
         titleView = findViewById(R.id.title)
+        scoreView = findViewById(R.id.score)
         diceContainer = findViewById(R.id.diceContainer)
         addDiceSlots(DICE_COUNT)
         enforceSquareSlots()
@@ -64,7 +71,8 @@ class DiceSet @JvmOverloads constructor(
      * Sets the face values for the dice in this set.
      * Expects up to five entries; missing slots are cleared.
      */
-    fun setDiceFaces(faces: List<Int>) {
+    fun setDiceFaces(faces: List<Int>, lockFaces: Boolean = false) {
+        if (lockFaces) facesLocked = true
         val limitedFaces = faces.take(DICE_COUNT)
         limitedFaces.forEachIndexed { index, face ->
             diceSlots.getOrNull(index)?.let { slot ->
@@ -80,6 +88,14 @@ class DiceSet @JvmOverloads constructor(
                 updateSlot(slot)
             }
         }
+    }
+
+    fun isLocked(): Boolean = facesLocked
+
+    fun getFaces(): List<Int> = diceSlots.map { it.face }
+
+    fun setScore(score: Int) {
+        scoreView.text = score.toString()
     }
 
     /**
