@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -176,10 +177,22 @@ class MainActivity : AppCompatActivity() {
         gotoGameBtn.setNeonGlow("#FFFF00")
 
         gotoGameBtn.setOnClickListener {
+            val connectedDice = diceManager.getAllDice().filter { diceManager.isConnected(it) }
+            if (connectedDice.size != 5) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.exactly_five_dice_required),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            // TODO: Plug in dice selection logic here to set exactly 5 dice in the manager
+            prepareDiceForGame(connectedDice)
+
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-//            finish()
         }
 
     }
@@ -224,6 +237,17 @@ class MainActivity : AppCompatActivity() {
             )
         diceViewer.adapter = diceViewAdapter
         Log.d("DiceList", "Dice list updated")
+    }
+    //endregion
+
+    //region Game setup hook
+    /**
+     * Placeholder to apply exactly 5 selected dice to the game manager before starting.
+     * Replace the body with actual selection/assignment logic when ready.
+     */
+    private fun prepareDiceForGame(selectedDice: List<IDice>) {
+        // Intentionally left for future implementation.
+        // Example: diceManager.setActiveDice(selectedDice)
     }
     //endregion
 

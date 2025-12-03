@@ -2,9 +2,10 @@ package com.example.godicetest.activities
 
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.GridLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godicetest.R
@@ -95,6 +96,7 @@ class GameActivity : AppCompatActivity() {
                 val combination = title?.let { combinationsByTitle[it] }
                 if (combination != null) {
                     diceSetsByCombination[combination] = child
+                    child.setOnClickListener { handleDiceSetClick(child, combination) }
                 } else {
                     Log.w("GameActivity", "DiceSet title not mapped to combination: $title")
                 }
@@ -117,11 +119,17 @@ class GameActivity : AppCompatActivity() {
             .take(5)
 
         diceSetsByCombination.forEach { (combination, diceSet) ->
-            val facesForSet = if (diceSet.isLocked()) diceSet.getFaces() else liveFaces
-            if (!diceSet.isLocked()) {
-                diceSet.setDiceFaces(facesForSet, lockFaces = false)
+            val facesForDisplay = if (diceSet.isLocked()) {
+                diceSet.getFaces()
+            } else {
+                // Show best-scoring pattern per category until user locks a real roll
+                placeholderFaces[combination] ?: emptyList()
             }
-            val score = calculateScore(combination, facesForSet)
+            val facesForScore = if (diceSet.isLocked()) diceSet.getFaces() else liveFaces
+            if (!diceSet.isLocked()) {
+                diceSet.setDiceFaces(facesForDisplay, lockFaces = false)
+            }
+            val score = calculateScore(combination, facesForScore)
             diceSet.setScore(score)
         }
     }
@@ -142,6 +150,7 @@ class GameActivity : AppCompatActivity() {
                 val freq = counts.values.sorted()
                 if (freq == listOf(2, 3)) 25 else 0
             }
+
             eYahtzeeCombination.SMALL_STRAIGHT -> if (hasStraight(faces, 4)) 30 else 0
             eYahtzeeCombination.LARGE_STRAIGHT -> if (hasStraight(faces, 5)) 40 else 0
             eYahtzeeCombination.YAHTZEE -> if (faces.distinct().size == 1) 50 else 0
@@ -156,5 +165,27 @@ class GameActivity : AppCompatActivity() {
 
     private fun refreshOnUi() {
         runOnUiThread { refreshDiceSetsFromManager() }
+    }
+
+    private fun handleDiceSetClick(diceSet: DiceSet, combination: eYahtzeeCombination) {
+        if (diceSet.isLocked()) return
+
+        val diceForResult = diceManager.getAllDice()
+            .filter { diceManager.isConnected(it) }
+            .take(5)
+
+        if (diceForResult.size < 5) {
+            Toast.makeText(
+                this,
+                getString(R.string.not_enough_dice_message),
+                Toast.LENGTH_SHORT
+            ).show()
+            Log.w("GameActivity", "Not enough connected dice to lock result for $combination")
+            return
+        }
+
+        diceSet.setDiceResults(diceForResult)
+        diceSet.setScore(calculateScore(combination, diceSet.getFaces()))
+        diceSet.isClickable = false
     }
 }

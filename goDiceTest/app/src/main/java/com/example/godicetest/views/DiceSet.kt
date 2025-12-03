@@ -13,6 +13,7 @@ import com.example.godicetest.enums.eDiceNeonColor
 import com.example.godicetest.enums.eDicePattern
 import com.example.godicetest.extensions.setNeonColor
 import com.example.godicetest.extensions.setNeonGlow
+import com.example.godicetest.interfaces.IDice
 import kotlin.math.roundToInt
 
 class DiceSet @JvmOverloads constructor(
@@ -85,6 +86,24 @@ class DiceSet @JvmOverloads constructor(
                 val slot = diceSlots[index]
                 slot.face = 0
                 slot.color = null
+                updateSlot(slot)
+            }
+        }
+    }
+
+    /**
+     * Locks the set with exactly five dice objects, snapshotting face and color.
+     * Further automatic updates will be ignored until unlockFaces() is called.
+     */
+    fun setDiceResults(diceList: List<IDice>) {
+        require(diceList.size == DICE_COUNT) {
+            "DiceSet requires exactly $DICE_COUNT dice to set results"
+        }
+        facesLocked = true
+        diceList.forEachIndexed { index, dice ->
+            diceSlots.getOrNull(index)?.let { slot ->
+                slot.face = dice.lastRoll.value ?: 0
+                slot.color = dice.color.value
                 updateSlot(slot)
             }
         }

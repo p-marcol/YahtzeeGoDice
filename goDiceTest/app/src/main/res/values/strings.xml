@@ -22,4 +22,6 @@
     <string name="total_Score">Total Score</string>
     <string name="round">Round:</string>
     <string name="set_name_title">Set Name</string>
+    <string name="not_enough_dice_message">Podłącz 5 kostek, żeby zablokować wynik.</string>
+    <string name="exactly_five_dice_required">Musisz mieć podłączone dokładnie 5 kostek, żeby zacząć grę.</string>
 </resources>
