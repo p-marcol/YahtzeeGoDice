@@ -2,11 +2,11 @@ package com.example.godicetest.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.view.ViewTreeObserver
 import com.example.godicetest.R
 import com.example.godicetest.adapters.getColorHex
 import com.example.godicetest.enums.eDiceNeonColor
@@ -100,13 +100,14 @@ class DiceSet @JvmOverloads constructor(
             "DiceSet requires exactly $DICE_COUNT dice to set results"
         }
         facesLocked = true
-        diceList.forEachIndexed { index, dice ->
-            diceSlots.getOrNull(index)?.let { slot ->
-                slot.face = dice.lastRoll.value ?: 0
-                slot.color = dice.color.value
-                updateSlot(slot)
+        diceList.sortedBy { dice -> dice.lastRoll.value }
+            .forEachIndexed { index, dice ->
+                diceSlots.getOrNull(index)?.let { slot ->
+                    slot.face = dice.lastRoll.value ?: 0
+                    slot.color = dice.color.value
+                    updateSlot(slot)
+                }
             }
-        }
     }
 
     fun isLocked(): Boolean = facesLocked
@@ -160,7 +161,7 @@ class DiceSet @JvmOverloads constructor(
             object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     val availableWidth = diceContainer.width -
-                        diceContainer.paddingStart - diceContainer.paddingEnd
+                            diceContainer.paddingStart - diceContainer.paddingEnd
                     if (availableWidth <= 0) return
 
                     val margin = dpToPx(4)
