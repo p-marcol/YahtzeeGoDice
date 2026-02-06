@@ -12,8 +12,8 @@ interface IDiceManager {
     //region Connections
     fun startScan(adapter: BluetoothAdapter, onComplete: () -> Unit)
     fun connectDice(context: Context, dice: IDice)
-
     fun isConnected(dice: IDice): Boolean
+    fun disconnectDice(dice: IDice)
     //endregion
 
     //region Dice lookup

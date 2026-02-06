@@ -129,5 +129,13 @@ class MockDiceManager private constructor() : IDiceManager {
     }
 
     override fun isConnected(dice: IDice): Boolean = dice.isConnected()
+
+    override fun disconnectDice(dice: IDice) {
+        val mock = dice as? MockDice ?: return
+        if (!diceList.contains(mock)) return
+        mock.disconnect()
+        listeners.forEach { it.onConnectionChanged(mock, false) }
+        listeners.forEach { it.onDisconnected(mock) }
+    }
     //endregion
 }

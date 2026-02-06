@@ -220,6 +220,11 @@ class Dice(override val id: Int, override val device: BluetoothDevice) : IDice {
         this.gatt = gatt
     }
 
+    internal fun disconnect() {
+        gatt?.disconnect()
+        closeGatt()
+    }
+
     internal fun closeGatt() {
         gatt?.close()
         gatt = null

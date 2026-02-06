@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var scrollView: ScrollView
     private lateinit var diceViewer: RecyclerView
     private lateinit var diceViewAdapter: DiceViewAdapter
-    private lateinit var diceSelector: DiceSelector
+    private var diceSelector: DiceSelector? = null
     //endregion
 
     //region Lifecycle
@@ -186,7 +186,12 @@ class MainActivity : AppCompatActivity() {
 
         gotoGameBtn.setOnClickListener {
             val connectedDice = diceManager.getAllDice().filter { diceManager.isConnected(it) }
-            if (connectedDice.size != 5) {
+            val selectedDice = diceSelector?.getSelectedDice()
+            Log.d(
+                "Selection",
+                "Connected dice: ${connectedDice.size}, Selected dice: ${selectedDice?.size ?: 0}"
+            )
+            if (selectedDice == null || selectedDice.size != 5) {
                 Toast.makeText(
                     this,
                     getString(R.string.exactly_five_dice_required),
@@ -195,8 +200,7 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // TODO: Plug in dice selection logic here to set exactly 5 dice in the manager
-            prepareDiceForGame(connectedDice)
+            prepareDiceForGame(selectedDice)
 
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)
@@ -296,8 +300,10 @@ class MainActivity : AppCompatActivity() {
      * Replace the body with actual selection/assignment logic when ready.
      */
     private fun prepareDiceForGame(selectedDice: List<IDice>) {
-        // TODO: Intentionally left for future implementation.
-        // Example: diceManager.setActiveDice(selectedDice)
+        val dicesToUse = selectedDice
+        val dicesToDisconnect =
+            diceManager.getAllDice().filter { dice -> dice.id !in dicesToUse.map { it.id } }
+        dicesToDisconnect.forEach { dice -> diceManager.disconnectDice(dice) }
     }
     //endregion
 

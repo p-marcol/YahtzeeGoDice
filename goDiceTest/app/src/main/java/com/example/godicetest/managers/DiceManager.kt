@@ -59,7 +59,8 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
     private var bluetoothScanner: BluetoothLeScanner? = null
     private var scanCallback: ScanCallback? = null
     private val dices = mutableMapOf<String, Dice>() // Address -> Dice
-    private val diceIds = mutableListOf<String>() // List of Dice addresses
+    private val sdkIdToAddress = mutableMapOf<Int, String>() // SDK ID -> Dice address
+    private var nextDiceId = 0
 
     private val listeners = mutableListOf<IDiceStateListener>()
 
@@ -256,6 +257,28 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
 
     override fun isConnected(dice: IDice): Boolean = dice.isConnected()
 
+    override fun disconnectDice(dice: IDice) {
+        val realDice = dice as? Dice ?: run {
+            Log.w("DiceManager", "Unsupported dice implementation: ${dice::class.java.simpleName}")
+            return
+        }
+
+        val address = realDice.device.address
+        if (!dices.containsKey(address)) return
+
+        realDice.blinkLed(0xff0000, 0.2f, 0.2f, 1)
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            realDice.disconnect()
+            runOnMainThread {
+                listeners.forEach { it.onConnectionChanged(realDice, false) }
+                listeners.forEach { it.onDisconnected(realDice) }
+            }
+            dices.remove(address)
+            sdkIdToAddress.remove(realDice.id)
+        }, 300)
+    }
+
     //endregion
     //region Private Methods
 
@@ -270,11 +293,8 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
         val name = result.device.name ?: return
         if (!name.contains("GoDice") || dices.containsKey(address)) return
 
-        var diceId = diceIds.indexOf(address)
-        if (diceId < 0) {
-            diceId = diceIds.size
-            diceIds.add(address)
-        }
+        val diceId = nextDiceId++
+        sdkIdToAddress[diceId] = address
 
         val dice = Dice(diceId, result.device)
         dices[address] = dice
@@ -299,6 +319,14 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
     }
 
     /**
+     * Maps SDK dice ID to internal Dice instance.
+     */
+    private fun getDiceBySdkId(sdkId: Int): Dice? {
+        val address = sdkIdToAddress[sdkId] ?: return null
+        return dices[address]
+    }
+
+    /**
      * Notifies listeners that a new Dice device has been detected.
      */
     private fun onNewDiceDetected() {
@@ -316,7 +344,7 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
      * @param color The color value as an integer defined by GoDiceSDK.
      */
     override fun onDiceColor(diceId: Int, color: Int) {
-        val dice = dices[diceIds[diceId]] ?: return
+        val dice = getDiceBySdkId(diceId) ?: return
         dice.color.value = color
         Log.d("DiceManager", "Dice color: ID=$diceId, Color=$color")
         listeners.forEach { it.onColorChanged(dice, color) }
@@ -329,7 +357,7 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
      * @param face The face value shown on the Dice.
      */
     override fun onDiceStable(diceId: Int, face: Int) {
-        val dice = dices[diceIds[diceId]] ?: return
+        val dice = getDiceBySdkId(diceId) ?: return
         Log.d("DiceManager", "Dice stable: ID=$diceId, Face=$face")
         listeners.forEach { it.onStable(dice, face) }
     }
@@ -341,7 +369,7 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
      * @param number The number rolled (not used here).
      */
     override fun onDiceRoll(diceId: Int, number: Int) {
-        val dice = dices[diceIds[diceId]] ?: return
+        val dice = getDiceBySdkId(diceId) ?: return
         Log.d("DiceManager", "Dice rolling: ID=$diceId")
         listeners.forEach { it.onRolling(dice) }
     }
@@ -353,7 +381,7 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
      * @param charging True if the Dice is charging, false otherwise.
      */
     override fun onDiceChargingStateChanged(diceId: Int, charging: Boolean) {
-        val dice = dices[diceIds[diceId]] ?: return
+        val dice = getDiceBySdkId(diceId) ?: return
         Log.d("DiceManager", "Dice charging state changed: ID=$diceId, Charging=$charging")
         listeners.forEach { it.onChargingChanged(dice, charging) }
     }
@@ -365,7 +393,7 @@ class DiceManager() : GoDiceSDK.Listener, IDiceManager {
      * @param level The charge level as an integer percentage (0-100).
      */
     override fun onDiceChargeLevel(diceId: Int, level: Int) {
-        val dice = dices[diceIds[diceId]] ?: return
+        val dice = getDiceBySdkId(diceId) ?: return
         Log.d("DiceManager", "Dice charge level: ID=$diceId, Level=$level")
         listeners.forEach { it.onChargeLevel(dice, level) }
     }

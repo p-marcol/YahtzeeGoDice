@@ -44,6 +44,10 @@ class DiceSelector(
         }
     }
 
+    fun getSelectedDice(): List<IDice> {
+        return selectedDice.toList()
+    }
+
     //endregion
     //region Private Methods
 
