@@ -1,5 +1,6 @@
 package com.example.godicetest.activities
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -21,7 +22,6 @@ import com.example.godicetest.interfaces.IDiceManager
 import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.managers.DiceManagerFactory
 import com.example.godicetest.views.DiceSet
-import android.graphics.Color
 import kotlin.math.max
 
 class GameActivity : AppCompatActivity() {
@@ -95,7 +95,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun bindDiceSets() {
         val grid = findViewById<GridLayout>(R.id.diceGrid)
-        val combinationsByTitle = eYahtzeeCombination.values()
+        val combinationsByTitle = eYahtzeeCombination.entries
             .associateBy { getString(it.displayNameRes) }
 
         for (index in 0 until grid.childCount) {
@@ -234,7 +234,7 @@ class GameActivity : AppCompatActivity() {
     private fun applySystemBars() {
         window.statusBarColor = Color.BLACK
         window.navigationBarColor = Color.BLACK
-        WindowCompat.getInsetsController(window, window.decorView)?.apply {
+        WindowCompat.getInsetsController(window, window.decorView).apply {
             isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = false
         }

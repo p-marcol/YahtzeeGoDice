@@ -284,7 +284,7 @@ class MainActivity : AppCompatActivity() {
     private fun applySystemBars() {
         window.statusBarColor = Color.BLACK
         window.navigationBarColor = Color.BLACK
-        WindowCompat.getInsetsController(window, window.decorView)?.apply {
+        WindowCompat.getInsetsController(window, window.decorView).apply {
             isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = false
         }
@@ -296,7 +296,7 @@ class MainActivity : AppCompatActivity() {
      * Replace the body with actual selection/assignment logic when ready.
      */
     private fun prepareDiceForGame(selectedDice: List<IDice>) {
-        // Intentionally left for future implementation.
+        // TODO: Intentionally left for future implementation.
         // Example: diceManager.setActiveDice(selectedDice)
     }
     //endregion
