@@ -6,6 +6,7 @@ package com.example.godicetest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,6 +18,10 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +35,7 @@ import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.managers.DiceManagerFactory
 import com.example.godicetest.managers.DiceSelector
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 /**
  * Main activity for the GoDice test application.
@@ -57,6 +63,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        applySystemBars()
+        applySafeAreaInsets(findViewById(R.id.constraint))
 
         textView = findViewById(R.id.textView)
         scrollView = findViewById(R.id.scrollView)
@@ -239,6 +247,48 @@ class MainActivity : AppCompatActivity() {
         Log.d("DiceList", "Dice list updated")
     }
     //endregion
+
+    private fun applySafeAreaInsets(root: View) {
+        val initial = Insets.of(
+            root.paddingLeft,
+            root.paddingTop,
+            root.paddingRight,
+            root.paddingBottom
+        )
+
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val cutout = insets.displayCutout
+            val cutoutLeft = cutout?.safeInsetLeft ?: 0
+            val cutoutTop = cutout?.safeInsetTop ?: 0
+            val cutoutRight = cutout?.safeInsetRight ?: 0
+            val cutoutBottom = cutout?.safeInsetBottom ?: 0
+
+            val left = max(systemBars.left, cutoutLeft)
+            val top = max(systemBars.top, cutoutTop)
+            val right = max(systemBars.right, cutoutRight)
+            val bottom = max(systemBars.bottom, cutoutBottom)
+
+            view.setPadding(
+                initial.left + left,
+                initial.top + top,
+                initial.right + right,
+                initial.bottom + bottom
+            )
+            insets
+        }
+
+        ViewCompat.requestApplyInsets(root)
+    }
+
+    private fun applySystemBars() {
+        window.statusBarColor = Color.BLACK
+        window.navigationBarColor = Color.BLACK
+        WindowCompat.getInsetsController(window, window.decorView)?.apply {
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = false
+        }
+    }
 
     //region Game setup hook
     /**
