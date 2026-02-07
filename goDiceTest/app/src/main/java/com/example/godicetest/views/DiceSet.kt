@@ -50,6 +50,12 @@ class DiceSet @JvmOverloads constructor(
         titleView = findViewById(R.id.title)
         scoreView = findViewById(R.id.score)
         diceContainer = findViewById(R.id.diceContainer)
+        isFocusable = true
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+        titleView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        scoreView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        diceContainer.importantForAccessibility =
+            View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         addDiceSlots(DICE_COUNT)
         enforceSquareSlots()
 
@@ -62,10 +68,12 @@ class DiceSet @JvmOverloads constructor(
                     recycle()
                 }
             }
+        updateAccessibilityLabel()
     }
 
     fun setTitle(text: String) {
         titleView.text = text
+        updateAccessibilityLabel()
     }
 
     /**
@@ -116,6 +124,7 @@ class DiceSet @JvmOverloads constructor(
 
     fun setScore(score: Int) {
         scoreView.text = score.toString()
+        updateAccessibilityLabel()
     }
 
     /**
@@ -206,6 +215,17 @@ class DiceSet @JvmOverloads constructor(
             if (isDot) {
                 cell.setNeonColor(colorHex)
             }
+        }
+    }
+
+    private fun updateAccessibilityLabel() {
+        val title = titleView.text?.toString()?.trim().orEmpty()
+        val score = scoreView.text?.toString()?.trim().orEmpty()
+        contentDescription = when {
+            title.isNotEmpty() && score.isNotEmpty() -> "$title, score $score"
+            title.isNotEmpty() -> title
+            score.isNotEmpty() -> "score $score"
+            else -> ""
         }
     }
 
