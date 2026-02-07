@@ -4,7 +4,7 @@
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white)
 ![Build Flavors](https://img.shields.io/badge/Flavors-real%20%7C%20mock-blue)
 ![Silesian University of Technology](https://img.shields.io/badge/University-Silesian%20University%20of%20Technology-0057B8)
-![2025](https://img.shields.io/badge/Year-2025-orange)
+![2026](https://img.shields.io/badge/Year-2026-orange)
 
 **YahtzeeGoDice** is a mobile application that brings the classic game **Yahtzee** to life using physical **GoDice** smart dice.  
 The app uses Bluetooth Low Energy to connect with GoDice and react to real dice rolls in real-time.
@@ -85,8 +85,8 @@ init {
     GoDiceSDK.listener = object : GoDiceSDK.Listener {
         override fun onDiceColor(diceId: Int, color: Int) {
             Log.d("DiceManager", "Dice color changed: ID=$diceId, Color=$color")
-            val dice = dices.values.firstOrNull { it.getSdkId() == diceId } ?: return
-            dice.color = color
+            val dice = getDiceBySdkId(diceId) ?: return
+            dice.color.value = color
             listeners.forEach { it.onColorChanged(dice, color) }
         }
     }
@@ -129,7 +129,7 @@ Note: The **GoDice SDK** has its own licensing terms. Please refer to the offici
 
 ---
 
-_Project developed as part of the course **Mobile Application Design**, Silesian University of Technology, 2025._
+_Project developed as part of the course **Mobile Application Design**, Silesian University of Technology, 2026._
 
 ---
 
