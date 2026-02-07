@@ -27,4 +27,6 @@
     <string name="goto_game">GOTO GAME</string>
     <string name="select_dice">Select Dice</string>
     <string name="_1">1</string>
+    <string name="connect_dice_description">Connect %1$s</string>
+    <string name="connected_dice_description">Connected %1$s</string>
 </resources>

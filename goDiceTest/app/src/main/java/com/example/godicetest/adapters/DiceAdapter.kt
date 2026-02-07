@@ -90,6 +90,7 @@ class DiceAdapter(
                 Triple(roll, stable, color)
             }.collect { (roll, stable) ->
                 val connected = isDiceConnected(dice)
+                val diceLabel = buildDiceLabel(dice)
                 holder.tvState.text = when {
                     !connected -> "Not connected"
                     roll == null -> "No roll"
@@ -101,6 +102,17 @@ class DiceAdapter(
                 holder.tvColor.text = dice.getColorName()
                 holder.btnConnect.isEnabled = !connected
                 holder.btnConnect.text = if (!connected) "Connect" else "Connected"
+                holder.btnConnect.contentDescription = if (!connected) {
+                    holder.itemView.context.getString(
+                        R.string.connect_dice_description,
+                        diceLabel
+                    )
+                } else {
+                    holder.itemView.context.getString(
+                        R.string.connected_dice_description,
+                        diceLabel
+                    )
+                }
             }
 
         }
@@ -109,6 +121,13 @@ class DiceAdapter(
     }
 
     //endregion
+
+    private fun buildDiceLabel(dice: IDice): String {
+        val name = dice.getDieName()?.trim().orEmpty()
+        if (name.isNotEmpty()) return name
+        val color = dice.getColorName()?.trim().orEmpty()
+        return if (color.isNotEmpty()) "$color dice" else "Dice ${dice.id}"
+    }
 }
 
 // DiceAdapter.kt complete.
