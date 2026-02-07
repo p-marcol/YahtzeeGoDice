@@ -26,6 +26,8 @@
 
         <activity android:name=".activities.PlayerSetupActivity" />
 
+        <activity android:name=".activities.ResultsActivity" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

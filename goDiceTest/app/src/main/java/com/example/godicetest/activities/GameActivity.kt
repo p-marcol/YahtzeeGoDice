@@ -218,7 +218,11 @@ class GameActivity : AppCompatActivity() {
         player.scoreByCombination[combination] =
             calculateScore(combination, snapshots.map { it.face })
 
-        advanceToNextPlayer()
+        if (isGameComplete()) {
+            showResults()
+        } else {
+            advanceToNextPlayer()
+        }
     }
 
     private fun setupPlayers() {
@@ -250,6 +254,32 @@ class GameActivity : AppCompatActivity() {
             ).show()
         }
         refreshDiceSetsFromManager()
+    }
+
+    private fun isGameComplete(): Boolean {
+        val requiredCount = eYahtzeeCombination.entries.size
+        return players.isNotEmpty() &&
+                players.all { it.lockedByCombination.size == requiredCount }
+    }
+
+    private fun showResults() {
+        val totals = players.map { player ->
+            eYahtzeeCombination.entries.sumOf { combination ->
+                player.scoreByCombination[combination] ?: 0
+            }
+        }
+        val intent = android.content.Intent(this, ResultsActivity::class.java)
+            .putStringArrayListExtra(
+                ResultsActivity.EXTRA_PLAYER_NAMES,
+                ArrayList(players.map { it.name })
+            )
+            .putIntegerArrayListExtra(
+                ResultsActivity.EXTRA_PLAYER_SCORES,
+                ArrayList(totals)
+            )
+        startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        finish()
     }
 
     private fun applySafeAreaInsets(root: View) {

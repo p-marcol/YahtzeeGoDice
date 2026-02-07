@@ -41,4 +41,6 @@
     <string name="start_game">Start game</string>
     <string name="player_label">Player:</string>
     <string name="next_player_turn">Next player: %1$s</string>
+    <string name="final_scores">Final scores</string>
+    <string name="winner_label">Winner</string>
 </resources>
