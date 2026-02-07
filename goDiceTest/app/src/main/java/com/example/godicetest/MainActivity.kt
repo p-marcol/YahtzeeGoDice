@@ -191,7 +191,12 @@ class MainActivity : AppCompatActivity() {
                 "Selection",
                 "Connected dice: ${connectedDice.size}, Selected dice: ${selectedDice?.size ?: 0}"
             )
-            if (selectedDice == null || selectedDice.size != 5) {
+            val diceForGame = when {
+                selectedDice != null && selectedDice.size == 5 -> selectedDice
+                selectedDice.isNullOrEmpty() -> connectedDice
+                else -> selectedDice
+            }
+            if (diceForGame.size != 5) {
                 Toast.makeText(
                     this,
                     getString(R.string.exactly_five_dice_required),
@@ -200,7 +205,7 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            prepareDiceForGame(selectedDice)
+            prepareDiceForGame(diceForGame)
 
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)
