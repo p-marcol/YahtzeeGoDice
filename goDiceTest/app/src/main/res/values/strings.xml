@@ -29,4 +29,16 @@
     <string name="_1">1</string>
     <string name="connect_dice_description">Connect %1$s</string>
     <string name="connected_dice_description">Connected %1$s</string>
+    <string name="players_title">Players</string>
+    <string name="player_count_format">Players: %1$d</string>
+    <string name="add_player">Add player</string>
+    <string name="remove_player">Remove player</string>
+    <string name="player_name_required">Enter a player name.</string>
+    <string name="player_name_hint_1">Player 1 name</string>
+    <string name="player_name_hint_2">Player 2 name</string>
+    <string name="player_name_hint_3">Player 3 name</string>
+    <string name="player_name_hint_4">Player 4 name</string>
+    <string name="start_game">Start game</string>
+    <string name="player_label">Player:</string>
+    <string name="next_player_turn">Next player: %1$s</string>
 </resources>

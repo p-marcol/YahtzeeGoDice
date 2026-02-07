@@ -29,7 +29,10 @@ class GameActivity : AppCompatActivity() {
     private lateinit var diceManager: IDiceManager
     private lateinit var diceViewer: RecyclerView
     private lateinit var diceViewAdapter: DiceViewAdapter
+    private lateinit var playerNameView: TextView
     private val diceSetsByCombination = mutableMapOf<eYahtzeeCombination, DiceSet>()
+    private val players = mutableListOf<PlayerState>()
+    private var currentPlayerIndex = 0
     private val placeholderFaces = mapOf(
         eYahtzeeCombination.ONES to List(5) { 1 },
         eYahtzeeCombination.TWOS to List(5) { 2 },
@@ -64,8 +67,9 @@ class GameActivity : AppCompatActivity() {
 
         diceManager = DiceManagerFactory.getManager()
         diceManager.addListener(diceStateListener)
+        playerNameView = findViewById(R.id.playerName)
+        setupPlayers()
         bindDiceSets()
-        applyPlaceholderFaces()
         refreshDiceSetsFromManager()
 
         diceViewer = findViewById(R.id.diceViewer)
@@ -115,30 +119,41 @@ class GameActivity : AppCompatActivity() {
         refreshDiceSetsFromManager()
     }
 
-    private fun applyPlaceholderFaces() {
-        placeholderFaces.forEach { (combination, faces) ->
-            diceSetsByCombination[combination]?.setDiceFaces(faces, lockFaces = false)
-        }
-    }
-
     private fun refreshDiceSetsFromManager() {
+        val player = currentPlayer()
         val liveFaces = diceManager.getAllDice()
             .filter { diceManager.isConnected(it) }
             .mapNotNull { it.lastRoll.value }
             .take(5)
 
         diceSetsByCombination.forEach { (combination, diceSet) ->
-            val facesForDisplay = if (diceSet.isLocked()) {
-                diceSet.getFaces()
+            val lockedSnapshot = player.lockedByCombination[combination]
+            val facesForDisplay = if (lockedSnapshot != null) {
+                lockedSnapshot.map { it.face }
             } else {
                 // Show best-scoring pattern per category until user locks a real roll
                 placeholderFaces[combination] ?: emptyList()
             }
-            val facesForScore = if (diceSet.isLocked()) diceSet.getFaces() else liveFaces
-            if (!diceSet.isLocked()) {
+            if (lockedSnapshot != null) {
+                diceSet.setDiceFaces(facesForDisplay, lockFaces = true)
+                lockedSnapshot.forEachIndexed { index, snapshot ->
+                    diceSet.setDiceColor(index, snapshot.color)
+                }
+                diceSet.isClickable = false
+            } else {
+                diceSet.unlockFaces()
                 diceSet.setDiceFaces(facesForDisplay, lockFaces = false)
+                for (index in 0 until 5) {
+                    diceSet.setDiceColor(index, null)
+                }
+                diceSet.isClickable = true
             }
-            val score = calculateScore(combination, facesForScore)
+            val score = if (lockedSnapshot != null) {
+                player.scoreByCombination[combination]
+                    ?: calculateScore(combination, facesForDisplay)
+            } else {
+                calculateScore(combination, liveFaces)
+            }
             diceSet.setScore(score)
         }
     }
@@ -177,7 +192,8 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun handleDiceSetClick(diceSet: DiceSet, combination: eYahtzeeCombination) {
-        if (diceSet.isLocked()) return
+        val player = currentPlayer()
+        if (player.lockedByCombination.containsKey(combination)) return
 
         val diceForResult = diceManager.getAllDice()
             .filter { diceManager.isConnected(it) }
@@ -193,9 +209,47 @@ class GameActivity : AppCompatActivity() {
             return
         }
 
-        diceSet.setDiceResults(diceForResult)
-        diceSet.setScore(calculateScore(combination, diceSet.getFaces()))
-        diceSet.isClickable = false
+        val snapshots = diceForResult
+            .sortedBy { it.lastRoll.value ?: 0 }
+            .map { dice ->
+                DiceSnapshot(dice.lastRoll.value ?: 0, dice.color.value)
+            }
+        player.lockedByCombination[combination] = snapshots
+        player.scoreByCombination[combination] =
+            calculateScore(combination, snapshots.map { it.face })
+
+        advanceToNextPlayer()
+    }
+
+    private fun setupPlayers() {
+        val names = intent.getStringArrayListExtra(EXTRA_PLAYER_NAMES)
+            ?.filter { it.isNotBlank() }
+            ?.take(MAX_PLAYERS)
+            ?: emptyList()
+        val resolvedNames = if (names.isEmpty()) listOf("Player 1") else names
+        players.clear()
+        players.addAll(resolvedNames.map { PlayerState(it) })
+        currentPlayerIndex = 0
+        updatePlayerLabel()
+    }
+
+    private fun currentPlayer(): PlayerState = players[currentPlayerIndex]
+
+    private fun updatePlayerLabel() {
+        playerNameView.text = currentPlayer().name
+    }
+
+    private fun advanceToNextPlayer() {
+        if (players.size > 1) {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.size
+            updatePlayerLabel()
+            Toast.makeText(
+                this,
+                getString(R.string.next_player_turn, currentPlayer().name),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        refreshDiceSetsFromManager()
     }
 
     private fun applySafeAreaInsets(root: View) {
@@ -238,5 +292,26 @@ class GameActivity : AppCompatActivity() {
             isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = false
         }
+    }
+
+    private data class DiceSnapshot(
+        val face: Int,
+        val color: Int?
+    )
+
+    private data class PlayerState(
+        val name: String,
+        val lockedByCombination: MutableMap<eYahtzeeCombination, List<DiceSnapshot>> =
+            mutableMapOf(),
+        val scoreByCombination: MutableMap<eYahtzeeCombination, Int> = mutableMapOf()
+    )
+
+    companion object {
+        private const val MAX_PLAYERS = 4
+        const val EXTRA_PLAYER_NAMES = "com.example.godicetest.player_names"
+
+        fun createIntent(context: android.content.Context, names: ArrayList<String>) =
+            android.content.Intent(context, GameActivity::class.java)
+                .putStringArrayListExtra(EXTRA_PLAYER_NAMES, names)
     }
 }

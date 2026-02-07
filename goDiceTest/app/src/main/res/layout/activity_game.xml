@@ -30,14 +30,15 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/round"
-                    android:text="@string/round" />
+                    android:id="@+id/playerLabel"
+                    android:text="@string/player_label"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/rollCounter"
-                    android:text="0" />
+                    android:id="@+id/playerName"
+                    android:textColor="@android:color/white" />
             </LinearLayout>
 
             <GridLayout

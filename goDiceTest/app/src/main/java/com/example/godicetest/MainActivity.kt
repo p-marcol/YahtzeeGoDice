@@ -25,7 +25,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.godicetest.activities.GameActivity
+import com.example.godicetest.activities.PlayerSetupActivity
 import com.example.godicetest.adapters.DiceViewAdapter
 import com.example.godicetest.extensions.setNeonColor
 import com.example.godicetest.extensions.setNeonGlow
@@ -207,7 +207,7 @@ class MainActivity : AppCompatActivity() {
 
             prepareDiceForGame(diceForGame)
 
-            val intent = Intent(this, GameActivity::class.java)
+            val intent = Intent(this, PlayerSetupActivity::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
