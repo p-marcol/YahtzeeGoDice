@@ -13,6 +13,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.godicetest.R
+import com.example.godicetest.extensions.setNeonColor
+import com.example.godicetest.extensions.setNeonGlow
 import kotlin.math.max
 
 class PlayerSetupActivity : AppCompatActivity() {
@@ -41,6 +43,10 @@ class PlayerSetupActivity : AppCompatActivity() {
             findViewById(R.id.playerName3),
             findViewById(R.id.playerName4)
         )
+
+        addPlayerButton.setNeonColor("#00FFFF")
+        removePlayerButton.setNeonColor("#FF00FF")
+        startGameButton.setNeonGlow("#FFFF00")
 
         updatePlayerInputs()
 
