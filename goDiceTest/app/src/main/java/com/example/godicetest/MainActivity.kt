@@ -7,7 +7,9 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.graphics.Color
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -163,13 +165,38 @@ class MainActivity : AppCompatActivity() {
         scanButton.setNeonColor("#FF00FF")
 
         scanButton.setOnClickListener {
-            it.isEnabled = false
-            it.visibility = View.GONE
-            diceSelection.visibility = View.VISIBLE
-            gotoGameBtn.visibility = View.VISIBLE
             val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
             val adapter = bluetoothManager.adapter
+            if (adapter == null) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.bluetooth_required_for_scan),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
             PermissionsHelper.requestPermissions(this, adapter) {
+                if (!adapter.isEnabled) {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.bluetooth_required_for_scan),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@requestPermissions
+                }
+                if (!BuildConfig.USE_MOCK_DICE && !isLocationEnabled()) {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.location_required_for_scan),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                    return@requestPermissions
+                }
+                scanButton.isEnabled = false
+                scanButton.visibility = View.GONE
+                diceSelection.visibility = View.VISIBLE
+                gotoGameBtn.visibility = View.VISIBLE
                 diceManager.startScan(adapter) {}
             }
         }
@@ -288,6 +315,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         ViewCompat.requestApplyInsets(root)
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = getSystemService(LOCATION_SERVICE) as? LocationManager ?: return false
+        return locationManager.isLocationEnabled
     }
 
     private fun applySystemBars() {

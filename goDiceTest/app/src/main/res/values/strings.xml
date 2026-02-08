@@ -61,4 +61,6 @@
     <string name="dice_slot_state_empty">empty slot</string>
     <string name="dice_slot_blocked">blocked</string>
     <string name="dice_slot_not_blocked">not blocked</string>
+    <string name="bluetooth_required_for_scan">Bluetooth must be enabled to scan for dice.</string>
+    <string name="location_required_for_scan">Location (GPS) must be enabled to scan for dice.</string>
 </resources>
