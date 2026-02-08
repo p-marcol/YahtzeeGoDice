@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.widget.GridLayout
@@ -59,6 +60,7 @@ class GameActivity : AppCompatActivity() {
     private var rerollInProgress = false
     private var currentRerollTargetIds: Set<Int> = emptySet()
     private val currentRerollRolledIds = mutableSetOf<Int>()
+    private var rerollStartBlockedUntilMs = 0L
 
     private var activeDisplayDiceIds: List<Int?> = List(REQUIRED_DICE_COUNT) { null }
 
@@ -176,6 +178,7 @@ class GameActivity : AppCompatActivity() {
         rerollInProgress = false
         currentRerollTargetIds = emptySet()
         currentRerollRolledIds.clear()
+        rerollStartBlockedUntilMs = 0L
         activeDisplayDiceIds = List(REQUIRED_DICE_COUNT) { null }
         missingDiceToggleOn = false
         turnOffAllDiceLeds()
@@ -207,6 +210,7 @@ class GameActivity : AppCompatActivity() {
             rerollInProgress = false
             currentRerollTargetIds = emptySet()
             currentRerollRolledIds.clear()
+            rerollStartBlockedUntilMs = 0L
         }
     }
 
@@ -219,6 +223,9 @@ class GameActivity : AppCompatActivity() {
         if (!hasInitialRollCompleted()) {
             if (!turnRollSnapshots.containsKey(dice.id)) {
                 turnRollSnapshots[dice.id] = snapshot
+                if (hasInitialRollCompleted()) {
+                    rerollStartBlockedUntilMs = SystemClock.elapsedRealtime() + REROLL_START_DELAY_MS
+                }
             }
             return
         }
@@ -226,6 +233,7 @@ class GameActivity : AppCompatActivity() {
         if (rerollsUsed >= MAX_REROLLS) return
 
         if (!rerollInProgress) {
+            if (SystemClock.elapsedRealtime() < rerollStartBlockedUntilMs) return
             currentRerollTargetIds = requiredTurnDiceIds
                 .filterNot { it in heldDiceIds }
                 .toSet()
@@ -253,6 +261,7 @@ class GameActivity : AppCompatActivity() {
         currentRerollRolledIds.clear()
         rerollsUsed = (rerollsUsed + 1).coerceAtMost(MAX_REROLLS)
         heldDiceIds.clear()
+        rerollStartBlockedUntilMs = SystemClock.elapsedRealtime() + REROLL_START_DELAY_MS
 
         // Requirement: when reroll completes, LEDs must be turned off for all dice.
         turnOffAllDiceLeds()
@@ -687,6 +696,7 @@ class GameActivity : AppCompatActivity() {
         private const val REQUIRED_DICE_LED_COLOR = 0xFFE300
         private const val REQUIRED_DICE_LED_ON_DURATION = 0.12f
         private const val REQUIRED_DICE_LED_OFF_DURATION = 0.12f
+        private const val REROLL_START_DELAY_MS = 1500L
 
         const val EXTRA_PLAYER_NAMES = "com.example.godicetest.player_names"
 
