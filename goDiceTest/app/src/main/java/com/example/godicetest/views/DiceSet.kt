@@ -105,6 +105,14 @@ class DiceSet @JvmOverloads constructor(
 
     fun setDiceSlotsAccessibilityEnabled(enabled: Boolean) {
         slotAccessibilityEnabled = enabled
+        if (enabled) {
+            // Prevent TalkBack "activate" on summary node from passing a touch to middle die.
+            isClickable = true
+            setOnClickListener { }
+        } else {
+            isClickable = false
+            setOnClickListener(null)
+        }
         diceContainer.importantForAccessibility = if (enabled) {
             View.IMPORTANT_FOR_ACCESSIBILITY_YES
         } else {
@@ -117,7 +125,9 @@ class DiceSet @JvmOverloads constructor(
                 View.IMPORTANT_FOR_ACCESSIBILITY_NO
             }
             slot.root.isFocusable = enabled
-            slot.grid.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            if (slot.grid !== slot.root) {
+                slot.grid.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }
         }
     }
 
