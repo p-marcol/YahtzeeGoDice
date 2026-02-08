@@ -132,6 +132,7 @@ class GameActivity : AppCompatActivity() {
         turnDiceSet = findViewById(R.id.turnDiceSet)
 
         turnDiceSet.setHeaderVisible(false)
+        turnDiceSet.setDiceSlotsAccessibilityEnabled(true)
         turnDiceSet.setOnDiceSlotClickListener { index -> onTurnDiceSlotClicked(index) }
 
         setupPlayers()
@@ -434,6 +435,39 @@ class GameActivity : AppCompatActivity() {
             val id = activeDisplayDiceIds[index]
             turnDiceSet.setDiceLowered(index, id != null && id in heldDiceIds)
         }
+        updateTurnDiceAccessibility(displaySnapshots)
+    }
+
+    private fun updateTurnDiceAccessibility(displaySnapshots: List<DiceSnapshot>) {
+        val slotDescriptions = mutableListOf<String>()
+        displaySnapshots.forEachIndexed { index, snapshot ->
+            val diceId = activeDisplayDiceIds.getOrNull(index)
+            val isBlocked = diceId != null && diceId in heldDiceIds
+            val stateDescription = when {
+                diceId == null -> getString(R.string.dice_slot_state_empty)
+                shouldShowMissingForActiveDie(diceId) -> getString(R.string.dice_slot_state_not_rolled)
+                snapshot.face in 1..6 -> getString(R.string.dice_slot_state_value, snapshot.face)
+                else -> getString(R.string.dice_slot_state_not_rolled)
+            }
+            val blockedDescription = getString(
+                if (isBlocked) R.string.dice_slot_blocked else R.string.dice_slot_not_blocked
+            )
+            val slotDescription = getString(
+                R.string.dice_slot_accessibility_format,
+                index + 1,
+                stateDescription,
+                blockedDescription
+            )
+            turnDiceSet.setDiceSlotAccessibilityDescription(index, slotDescription)
+            slotDescriptions.add(slotDescription)
+        }
+
+        turnDiceSet.setAccessibilityLabelOverride(
+            getString(
+                R.string.turn_dice_accessibility_summary,
+                slotDescriptions.joinToString(" ")
+            )
+        )
     }
 
     private fun updateRollInfoText() {

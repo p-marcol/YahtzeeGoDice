@@ -33,6 +33,8 @@ class DiceSet @JvmOverloads constructor(
     private val baseDiceContainerPaddingBottom: Int
     private var facesLocked = false
     private var onDiceSlotClick: ((Int) -> Unit)? = null
+    private var slotAccessibilityEnabled = false
+    private var accessibilityLabelOverride: String? = null
 
     private data class DiceSlot(
         val root: View,
@@ -99,6 +101,34 @@ class DiceSet @JvmOverloads constructor(
 
     fun setOnDiceSlotClickListener(listener: ((Int) -> Unit)?) {
         onDiceSlotClick = listener
+    }
+
+    fun setDiceSlotsAccessibilityEnabled(enabled: Boolean) {
+        slotAccessibilityEnabled = enabled
+        diceContainer.importantForAccessibility = if (enabled) {
+            View.IMPORTANT_FOR_ACCESSIBILITY_YES
+        } else {
+            View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        }
+        diceSlots.forEach { slot ->
+            slot.root.importantForAccessibility = if (enabled) {
+                View.IMPORTANT_FOR_ACCESSIBILITY_YES
+            } else {
+                View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }
+            slot.root.isFocusable = enabled
+            slot.grid.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+    }
+
+    fun setAccessibilityLabelOverride(label: String?) {
+        accessibilityLabelOverride = label
+        updateAccessibilityLabel()
+    }
+
+    fun setDiceSlotAccessibilityDescription(index: Int, description: String) {
+        if (index !in diceSlots.indices) return
+        diceSlots[index].root.contentDescription = description
     }
 
     fun setDiceLowered(index: Int, lowered: Boolean, offsetDp: Int = 10) {
@@ -195,6 +225,9 @@ class DiceSet @JvmOverloads constructor(
             )
             grid.setOnClickListener { onDiceSlotClick?.invoke(slotIndex) }
             diceView.setOnClickListener { onDiceSlotClick?.invoke(slotIndex) }
+            grid.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            diceView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            diceView.isFocusable = false
             diceContainer.addView(diceView)
             diceSlots.add(DiceSlot(diceView, grid, cells, useSmallDots = true))
         }
@@ -254,6 +287,11 @@ class DiceSet @JvmOverloads constructor(
     }
 
     private fun updateAccessibilityLabel() {
+        val override = accessibilityLabelOverride?.trim().orEmpty()
+        if (override.isNotEmpty()) {
+            contentDescription = override
+            return
+        }
         val title = titleView.text?.toString()?.trim().orEmpty()
         val score = scoreView.text?.toString()?.trim().orEmpty()
         contentDescription = when {
