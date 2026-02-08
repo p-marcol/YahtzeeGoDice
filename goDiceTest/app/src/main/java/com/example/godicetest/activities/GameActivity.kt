@@ -72,7 +72,7 @@ class GameActivity : AppCompatActivity() {
     private val diceStateListener = object : IDiceStateListener {
         override fun onStable(dice: IDice, face: Int) {
             syncRequiredTurnDice()
-            if (dice.id in requiredTurnDiceIds) {
+            if (dice.id in requiredTurnDiceIds && !turnRollSnapshots.containsKey(dice.id)) {
                 turnRollSnapshots[dice.id] = DiceSnapshot(face, dice.color.value)
             }
             refreshOnUi()
