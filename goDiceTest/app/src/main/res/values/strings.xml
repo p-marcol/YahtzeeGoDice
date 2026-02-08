@@ -43,4 +43,8 @@
     <string name="next_player_turn">Next player: %1$s</string>
     <string name="final_scores">Final scores</string>
     <string name="winner_label">Winner</string>
+    <string name="roll_all_dice_required_info">Roll all 5 dice before choosing a points category. Rolled: %1$d/%2$d.</string>
+    <string name="roll_all_dice_required_default">Roll all 5 dice before choosing a points category.</string>
+    <string name="roll_all_dice_required_to_score">Roll all 5 dice first to choose a points category.</string>
+    <string name="roll_all_dice_connect_five">Connect exactly 5 dice to continue your turn.</string>
 </resources>

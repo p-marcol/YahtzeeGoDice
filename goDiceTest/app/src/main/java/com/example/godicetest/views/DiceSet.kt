@@ -24,6 +24,7 @@ class DiceSet @JvmOverloads constructor(
 
     private val titleView: TextView
     private val scoreView: TextView
+    private val headerContainer: View
     private val diceContainer: LinearLayout
     private val diceSlots = mutableListOf<DiceSlot>()
     private var facesLocked = false
@@ -49,6 +50,7 @@ class DiceSet @JvmOverloads constructor(
         orientation = VERTICAL
         titleView = findViewById(R.id.title)
         scoreView = findViewById(R.id.score)
+        headerContainer = findViewById(R.id.headerContainer)
         diceContainer = findViewById(R.id.diceContainer)
         isFocusable = true
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
@@ -74,6 +76,10 @@ class DiceSet @JvmOverloads constructor(
     fun setTitle(text: String) {
         titleView.text = text
         updateAccessibilityLabel()
+    }
+
+    fun setHeaderVisible(visible: Boolean) {
+        headerContainer.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     /**
