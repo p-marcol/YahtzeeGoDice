@@ -28,11 +28,14 @@ class GameActivity : AppCompatActivity() {
 
     private lateinit var diceManager: IDiceManager
     private lateinit var playerNameView: TextView
+    private lateinit var rerollsLeftText: TextView
     private lateinit var rollInfoText: TextView
     private lateinit var turnDiceSet: DiceSet
+
     private val diceSetsByCombination = mutableMapOf<eYahtzeeCombination, DiceSet>()
     private val players = mutableListOf<PlayerState>()
     private var currentPlayerIndex = 0
+
     private val placeholderFaces = mapOf(
         eYahtzeeCombination.ONES to List(5) { 1 },
         eYahtzeeCombination.TWOS to List(5) { 2 },
@@ -51,6 +54,14 @@ class GameActivity : AppCompatActivity() {
 
     private val requiredTurnDiceIds = mutableListOf<Int>()
     private val turnRollSnapshots = mutableMapOf<Int, DiceSnapshot>()
+    private val heldDiceIds = mutableSetOf<Int>()
+    private var rerollsUsed = 0
+    private var rerollInProgress = false
+    private var currentRerollTargetIds: Set<Int> = emptySet()
+    private val currentRerollRolledIds = mutableSetOf<Int>()
+
+    private var activeDisplayDiceIds: List<Int?> = List(REQUIRED_DICE_COUNT) { null }
+
     private val uiHandler = Handler(Looper.getMainLooper())
     private var missingDiceToggleOn = false
 
@@ -72,15 +83,14 @@ class GameActivity : AppCompatActivity() {
     private val diceStateListener = object : IDiceStateListener {
         override fun onStable(dice: IDice, face: Int) {
             syncRequiredTurnDice()
-            if (dice.id in requiredTurnDiceIds && !turnRollSnapshots.containsKey(dice.id)) {
-                turnRollSnapshots[dice.id] = DiceSnapshot(face, dice.color.value)
-            }
+            handleStableEvent(dice, face)
             refreshOnUi()
         }
 
         override fun onRolling(dice: IDice) = Unit
 
         override fun onColorChanged(dice: IDice, color: Int) {
+            if (dice.id in heldDiceIds) return
             val existing = turnRollSnapshots[dice.id] ?: return
             turnRollSnapshots[dice.id] = existing.copy(color = color)
             refreshOnUi()
@@ -115,10 +125,12 @@ class GameActivity : AppCompatActivity() {
         diceManager.addListener(diceStateListener)
 
         playerNameView = findViewById(R.id.playerName)
+        rerollsLeftText = findViewById(R.id.rerollsLeftText)
         rollInfoText = findViewById(R.id.rollInfoText)
         turnDiceSet = findViewById(R.id.turnDiceSet)
+
         turnDiceSet.setHeaderVisible(false)
-        turnDiceSet.isClickable = false
+        turnDiceSet.setOnDiceSlotClickListener { index -> onTurnDiceSlotClicked(index) }
 
         setupPlayers()
         bindDiceSets()
@@ -132,6 +144,7 @@ class GameActivity : AppCompatActivity() {
         super.onDestroy()
         uiHandler.removeCallbacks(missingDiceToggleRunnable)
         uiHandler.removeCallbacks(requiredDiceLedRunnable)
+        turnOffAllDiceLeds()
         diceManager.removeListener(diceStateListener)
     }
 
@@ -153,37 +166,203 @@ class GameActivity : AppCompatActivity() {
                 }
             }
         }
-        Log.d("GameActivity", "Mapped dice sets: ${diceSetsByCombination.keys}")
-    }
-
-    private fun syncRequiredTurnDice() {
-        val newRequiredIds = diceManager.getAllDice()
-            .filter { diceManager.isConnected(it) }
-            .sortedBy { it.id }
-            .take(REQUIRED_DICE_COUNT)
-            .map { it.id }
-
-        if (requiredTurnDiceIds == newRequiredIds) return
-
-        requiredTurnDiceIds.clear()
-        requiredTurnDiceIds.addAll(newRequiredIds)
-        turnRollSnapshots.keys.retainAll(newRequiredIds.toSet())
     }
 
     private fun beginTurn() {
         syncRequiredTurnDice()
         turnRollSnapshots.clear()
+        heldDiceIds.clear()
+        rerollsUsed = 0
+        rerollInProgress = false
+        currentRerollTargetIds = emptySet()
+        currentRerollRolledIds.clear()
+        activeDisplayDiceIds = List(REQUIRED_DICE_COUNT) { null }
         missingDiceToggleOn = false
+        turnOffAllDiceLeds()
         refreshDiceSetsFromManager()
+    }
+
+    private fun syncRequiredTurnDice() {
+        val connectedIds = diceManager.getAllDice()
+            .filter { diceManager.isConnected(it) }
+            .sortedBy { it.id }
+            .take(REQUIRED_DICE_COUNT)
+            .map { it.id }
+
+        if (connectedIds == requiredTurnDiceIds) return
+
+        requiredTurnDiceIds.clear()
+        requiredTurnDiceIds.addAll(connectedIds)
+        val requiredSet = requiredTurnDiceIds.toSet()
+
+        turnRollSnapshots.keys.retainAll(requiredSet)
+        heldDiceIds.retainAll(requiredSet)
+        currentRerollRolledIds.retainAll(requiredSet)
+        currentRerollTargetIds =
+            currentRerollTargetIds.filter { it in requiredSet && it !in heldDiceIds }.toSet()
+
+        if (requiredTurnDiceIds.size < REQUIRED_DICE_COUNT ||
+            (rerollInProgress && currentRerollTargetIds.isEmpty())
+        ) {
+            rerollInProgress = false
+            currentRerollTargetIds = emptySet()
+            currentRerollRolledIds.clear()
+        }
+    }
+
+    private fun handleStableEvent(dice: IDice, face: Int) {
+        if (dice.id !in requiredTurnDiceIds) return
+        if (dice.id in heldDiceIds) return
+
+        val snapshot = DiceSnapshot(dice.id, face, dice.color.value)
+
+        if (!hasInitialRollCompleted()) {
+            if (!turnRollSnapshots.containsKey(dice.id)) {
+                turnRollSnapshots[dice.id] = snapshot
+            }
+            return
+        }
+
+        if (rerollsUsed >= MAX_REROLLS) return
+
+        if (!rerollInProgress) {
+            currentRerollTargetIds = requiredTurnDiceIds
+                .filterNot { it in heldDiceIds }
+                .toSet()
+            if (currentRerollTargetIds.isEmpty()) return
+            currentRerollRolledIds.clear()
+            rerollInProgress = true
+        }
+
+        if (dice.id !in currentRerollTargetIds) return
+        if (dice.id in currentRerollRolledIds) return
+
+        turnRollSnapshots[dice.id] = snapshot
+        currentRerollRolledIds.add(dice.id)
+
+        if (currentRerollRolledIds.containsAll(currentRerollTargetIds)) {
+            completeRerollCycle()
+        }
+    }
+
+    private fun completeRerollCycle() {
+        if (!rerollInProgress) return
+
+        rerollInProgress = false
+        currentRerollTargetIds = emptySet()
+        currentRerollRolledIds.clear()
+        rerollsUsed = (rerollsUsed + 1).coerceAtMost(MAX_REROLLS)
+        heldDiceIds.clear()
+
+        // Requirement: when reroll completes, LEDs must be turned off for all dice.
+        turnOffAllDiceLeds()
+    }
+
+    private fun onTurnDiceSlotClicked(index: Int) {
+        val diceId = activeDisplayDiceIds.getOrNull(index) ?: return
+        toggleHeldDice(diceId)
+    }
+
+    private fun toggleHeldDice(diceId: Int) {
+        if (diceId !in requiredTurnDiceIds) return
+
+        if (!hasInitialRollCompleted()) {
+            Toast.makeText(
+                this,
+                getString(R.string.roll_all_dice_required_to_score),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        if (rerollInProgress) {
+            Toast.makeText(
+                this,
+                getString(R.string.reroll_wait_for_completion),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        if (rerollsUsed >= MAX_REROLLS) {
+            Toast.makeText(
+                this,
+                getString(R.string.rerolls_exhausted_info),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        if (diceId in heldDiceIds) {
+            heldDiceIds.remove(diceId)
+            setDiceLed(diceId, false)
+        } else {
+            if (turnRollSnapshots[diceId] == null) return
+            heldDiceIds.add(diceId)
+            // Requirement: selected/kept dice LED should be on.
+            setDiceLed(diceId, true)
+        }
+
+        refreshOnUi()
+    }
+
+    private fun setDiceLed(diceId: Int, on: Boolean) {
+        diceManager.getAllDice()
+            .firstOrNull { it.id == diceId && diceManager.isConnected(it) }
+            ?.setLed(on)
+    }
+
+    private fun turnOffAllDiceLeds() {
+        val connectedById = diceManager.getAllDice()
+            .filter { diceManager.isConnected(it) }
+            .associateBy { it.id }
+        requiredTurnDiceIds.forEach { id ->
+            connectedById[id]?.setLed(false)
+        }
+    }
+
+    private fun hasInitialRollCompleted(): Boolean {
+        return requiredTurnDiceIds.size == REQUIRED_DICE_COUNT &&
+                requiredTurnDiceIds.all { turnRollSnapshots.containsKey(it) }
+    }
+
+    private fun canScoreNow(): Boolean {
+        return requiredTurnDiceIds.size == REQUIRED_DICE_COUNT &&
+                hasInitialRollCompleted() &&
+                !rerollInProgress
+    }
+
+    private fun requiredDiceIdsToRollNow(): Set<Int> {
+        if (requiredTurnDiceIds.size < REQUIRED_DICE_COUNT) return emptySet()
+        return when {
+            !hasInitialRollCompleted() -> requiredTurnDiceIds
+                .filterNot { turnRollSnapshots.containsKey(it) }
+                .toSet()
+
+            rerollInProgress -> currentRerollTargetIds
+                .filterNot { it in currentRerollRolledIds }
+                .toSet()
+
+            else -> emptySet()
+        }
+    }
+
+    private fun shouldShowMissingForActiveDie(diceId: Int): Boolean {
+        return when {
+            !hasInitialRollCompleted() -> !turnRollSnapshots.containsKey(diceId)
+            rerollInProgress -> diceId in currentRerollTargetIds &&
+                    diceId !in currentRerollRolledIds
+
+            else -> false
+        }
     }
 
     private fun refreshDiceSetsFromManager() {
         syncRequiredTurnDice()
 
         val player = currentPlayer()
-        val turnReadyToScore = isTurnReadyToScore()
-        val turnFaces = turnFacesForScoring()
-        val turnDisplaySnapshots = buildTurnDisplaySnapshots()
+        val scoreFaces = facesForScoring()
+        val canScore = canScoreNow()
 
         diceSetsByCombination.forEach { (combination, diceSet) ->
             val lockedSnapshot = player.lockedByCombination[combination]
@@ -201,97 +380,118 @@ class GameActivity : AppCompatActivity() {
                 for (index in 0 until REQUIRED_DICE_COUNT) {
                     diceSet.setDiceColor(index, null)
                 }
-                diceSet.isClickable = turnReadyToScore
-                diceSet.alpha = if (turnReadyToScore) 1f else 0.85f
+                diceSet.isClickable = canScore
+                diceSet.alpha = if (canScore) 1f else 0.85f
             }
 
             val score = if (lockedSnapshot != null) {
                 player.scoreByCombination[combination]
                     ?: calculateScore(combination, lockedSnapshot.map { it.face })
             } else {
-                calculateScore(combination, turnFaces)
+                calculateScore(combination, scoreFaces)
             }
             diceSet.setScore(score)
         }
 
-        turnDiceSet.unlockFaces()
-        turnDiceSet.setDiceFaces(turnDisplaySnapshots.map { it.face }, lockFaces = false)
-        turnDisplaySnapshots.forEachIndexed { index, snapshot ->
-            turnDiceSet.setDiceColor(index, snapshot.color)
-        }
-
-        updateRollInfoText(turnReadyToScore)
+        renderBottomDiceSets()
+        updateRollInfoText()
+        updateRerollsInfo()
     }
 
-    private fun buildTurnDisplaySnapshots(): List<DiceSnapshot> {
-        val snapshots = mutableListOf<DiceSnapshot>()
-        for (index in 0 until REQUIRED_DICE_COUNT) {
-            val diceId = requiredTurnDiceIds.getOrNull(index)
-            val rolled = diceId?.let { turnRollSnapshots[it] }
-            if (rolled != null) {
-                snapshots.add(rolled)
-            } else {
-                snapshots.add(
-                    DiceSnapshot(
-                        face = if (missingDiceToggleOn) 1 else 0,
-                        color = if (missingDiceToggleOn) GoDiceSDK.DICE_YELLOW else null
-                    )
+    private fun renderBottomDiceSets() {
+        activeDisplayDiceIds = (requiredTurnDiceIds.map { it as Int? } +
+                List((REQUIRED_DICE_COUNT - requiredTurnDiceIds.size).coerceAtLeast(0)) { null })
+            .take(REQUIRED_DICE_COUNT)
+
+        val displaySnapshots = activeDisplayDiceIds.map { id ->
+            val snapshot = id?.let { turnRollSnapshots[it] }
+            when {
+                id == null -> DiceSnapshot(-1, 0, null)
+                shouldShowMissingForActiveDie(id) -> DiceSnapshot(
+                    id,
+                    if (missingDiceToggleOn) 1 else 0,
+                    if (missingDiceToggleOn) GoDiceSDK.DICE_YELLOW else null
                 )
+
+                snapshot != null -> snapshot
+                else -> DiceSnapshot(id, 0, null)
             }
         }
-        return snapshots
-    }
 
-    private fun turnFacesForScoring(): List<Int> {
-        return requiredTurnDiceIds.mapNotNull { turnRollSnapshots[it]?.face }
-    }
-
-    private fun isTurnReadyToScore(): Boolean {
-        return requiredTurnDiceIds.size == REQUIRED_DICE_COUNT &&
-                requiredTurnDiceIds.all { turnRollSnapshots.containsKey(it) }
-    }
-
-    private fun updateRollInfoText(turnReadyToScore: Boolean) {
-        if (turnReadyToScore) {
-            rollInfoText.visibility = View.GONE
-            return
+        turnDiceSet.unlockFaces()
+        turnDiceSet.setDiceFaces(displaySnapshots.map { it.face }, lockFaces = false)
+        displaySnapshots.forEachIndexed { index, snapshot ->
+            turnDiceSet.setDiceColor(index, snapshot.color)
+            val id = activeDisplayDiceIds[index]
+            turnDiceSet.setDiceLowered(index, id != null && id in heldDiceIds)
         }
+    }
 
-        rollInfoText.visibility = View.VISIBLE
+    private fun updateRollInfoText() {
         if (requiredTurnDiceIds.size < REQUIRED_DICE_COUNT) {
+            rollInfoText.visibility = View.VISIBLE
             rollInfoText.text = getString(R.string.roll_all_dice_connect_five)
             return
         }
 
-        val rolledCount = requiredTurnDiceIds.count { turnRollSnapshots.containsKey(it) }
-        rollInfoText.text = getString(
-            R.string.roll_all_dice_required_info,
-            rolledCount,
-            REQUIRED_DICE_COUNT
-        )
+        if (!hasInitialRollCompleted()) {
+            val rolledCount = requiredTurnDiceIds.count { turnRollSnapshots.containsKey(it) }
+            rollInfoText.visibility = View.VISIBLE
+            rollInfoText.text = getString(
+                R.string.roll_all_dice_required_info,
+                rolledCount,
+                REQUIRED_DICE_COUNT
+            )
+            return
+        }
+
+        if (rerollInProgress) {
+            rollInfoText.visibility = View.VISIBLE
+            rollInfoText.text = getString(
+                R.string.reroll_in_progress_info,
+                currentRerollRolledIds.size,
+                currentRerollTargetIds.size
+            )
+            return
+        }
+
+        rollInfoText.visibility = View.VISIBLE
+        rollInfoText.text = if (rerollsUsed >= MAX_REROLLS) {
+            getString(R.string.rerolls_exhausted_info)
+        } else {
+            getString(R.string.reroll_hint_info)
+        }
+    }
+
+    private fun updateRerollsInfo() {
+        val rerollsLeft = (MAX_REROLLS - rerollsUsed).coerceAtLeast(0)
+        rerollsLeftText.text = getString(R.string.rerolls_left_format, rerollsLeft)
     }
 
     private fun flashRequiredDiceLeds() {
         if (!::diceManager.isInitialized) return
 
         syncRequiredTurnDice()
-        if (requiredTurnDiceIds.size < REQUIRED_DICE_COUNT || isTurnReadyToScore()) return
-
-        val missingIds = requiredTurnDiceIds.filterNot { turnRollSnapshots.containsKey(it) }
-        if (missingIds.isEmpty()) return
+        val requiredToRoll = requiredDiceIdsToRollNow()
+        if (requiredToRoll.isEmpty()) return
 
         val connectedById = diceManager.getAllDice()
             .filter { diceManager.isConnected(it) }
             .associateBy { it.id }
 
-        missingIds.forEach { diceId ->
-            connectedById[diceId]?.blinkLed(
+        requiredToRoll.forEach { id ->
+            connectedById[id]?.blinkLed(
                 color = REQUIRED_DICE_LED_COLOR,
                 onDuration = REQUIRED_DICE_LED_ON_DURATION,
                 offDuration = REQUIRED_DICE_LED_OFF_DURATION,
                 blinks = 1
             )
         }
+    }
+
+    private fun facesForScoring(): List<Int> {
+        if (!canScoreNow()) return emptyList()
+        return requiredTurnDiceIds.mapNotNull { id -> turnRollSnapshots[id]?.face }
     }
 
     private fun calculateScore(combination: eYahtzeeCombination, faces: List<Int>): Int {
@@ -331,12 +531,13 @@ class GameActivity : AppCompatActivity() {
         val player = currentPlayer()
         if (player.lockedByCombination.containsKey(combination)) return
 
-        if (!isTurnReadyToScore()) {
-            Toast.makeText(
-                this,
-                getString(R.string.roll_all_dice_required_to_score),
-                Toast.LENGTH_SHORT
-            ).show()
+        if (!canScoreNow()) {
+            val messageRes = when {
+                requiredTurnDiceIds.size < REQUIRED_DICE_COUNT -> R.string.roll_all_dice_connect_five
+                rerollInProgress -> R.string.reroll_wait_for_completion
+                else -> R.string.roll_all_dice_required_to_score
+            }
+            Toast.makeText(this, getString(messageRes), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -348,7 +549,7 @@ class GameActivity : AppCompatActivity() {
         if (snapshots.size < REQUIRED_DICE_COUNT) {
             Toast.makeText(
                 this,
-                getString(R.string.roll_all_dice_connect_five),
+                getString(R.string.roll_all_dice_required_to_score),
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -465,6 +666,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private data class DiceSnapshot(
+        val diceId: Int,
         val face: Int,
         val color: Int?
     )
@@ -479,6 +681,7 @@ class GameActivity : AppCompatActivity() {
     companion object {
         private const val MAX_PLAYERS = 4
         private const val REQUIRED_DICE_COUNT = 5
+        private const val MAX_REROLLS = 2
         private const val MISSING_DICE_TOGGLE_INTERVAL_MS = 550L
         private const val REQUIRED_DICE_LED_FLASH_INTERVAL_MS = 2200L
         private const val REQUIRED_DICE_LED_COLOR = 0xFFE300

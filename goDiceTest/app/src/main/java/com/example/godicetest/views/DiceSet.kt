@@ -27,14 +27,21 @@ class DiceSet @JvmOverloads constructor(
     private val headerContainer: View
     private val diceContainer: LinearLayout
     private val diceSlots = mutableListOf<DiceSlot>()
+    private val baseDiceContainerPaddingLeft: Int
+    private val baseDiceContainerPaddingTop: Int
+    private val baseDiceContainerPaddingRight: Int
+    private val baseDiceContainerPaddingBottom: Int
     private var facesLocked = false
+    private var onDiceSlotClick: ((Int) -> Unit)? = null
 
     private data class DiceSlot(
+        val root: View,
         val grid: NeonGridLayout,
         val cells: List<View>,
         val useSmallDots: Boolean = false,
         var face: Int = 0,
-        var color: Int? = null
+        var color: Int? = null,
+        var lowered: Boolean = false
     )
 
     companion object {
@@ -52,6 +59,14 @@ class DiceSet @JvmOverloads constructor(
         scoreView = findViewById(R.id.score)
         headerContainer = findViewById(R.id.headerContainer)
         diceContainer = findViewById(R.id.diceContainer)
+        baseDiceContainerPaddingLeft = diceContainer.paddingLeft
+        baseDiceContainerPaddingTop = diceContainer.paddingTop
+        baseDiceContainerPaddingRight = diceContainer.paddingRight
+        baseDiceContainerPaddingBottom = diceContainer.paddingBottom
+        clipChildren = false
+        clipToPadding = false
+        diceContainer.clipChildren = false
+        diceContainer.clipToPadding = false
         isFocusable = true
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         titleView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
@@ -80,6 +95,18 @@ class DiceSet @JvmOverloads constructor(
 
     fun setHeaderVisible(visible: Boolean) {
         headerContainer.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    fun setOnDiceSlotClickListener(listener: ((Int) -> Unit)?) {
+        onDiceSlotClick = listener
+    }
+
+    fun setDiceLowered(index: Int, lowered: Boolean, offsetDp: Int = 10) {
+        if (index !in diceSlots.indices) return
+        val slot = diceSlots[index]
+        slot.lowered = lowered
+        slot.root.translationY = if (lowered) dpToPx(offsetDp).toFloat() else 0f
+        updateLoweredInset(offsetDp)
     }
 
     /**
@@ -166,8 +193,10 @@ class DiceSet @JvmOverloads constructor(
                 diceView.findViewById(R.id.cell_21),
                 diceView.findViewById(R.id.cell_22)
             )
+            grid.setOnClickListener { onDiceSlotClick?.invoke(slotIndex) }
+            diceView.setOnClickListener { onDiceSlotClick?.invoke(slotIndex) }
             diceContainer.addView(diceView)
-            diceSlots.add(DiceSlot(grid, cells, useSmallDots = true))
+            diceSlots.add(DiceSlot(diceView, grid, cells, useSmallDots = true))
         }
     }
 
@@ -249,4 +278,14 @@ class DiceSet @JvmOverloads constructor(
 
     private fun dpToPx(dp: Int): Int =
         (dp * resources.displayMetrics.density).roundToInt()
+
+    private fun updateLoweredInset(offsetDp: Int) {
+        val extraBottom = if (diceSlots.any { it.lowered }) dpToPx(offsetDp) else 0
+        diceContainer.setPadding(
+            baseDiceContainerPaddingLeft,
+            baseDiceContainerPaddingTop,
+            baseDiceContainerPaddingRight,
+            baseDiceContainerPaddingBottom + extraBottom
+        )
+    }
 }
