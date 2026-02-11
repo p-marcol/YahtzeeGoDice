@@ -624,7 +624,12 @@ class GameActivity : AppCompatActivity() {
     private fun currentPlayer(): PlayerState = players[currentPlayerIndex]
 
     private fun updatePlayerLabel() {
-        playerNameView.text = currentPlayer().name
+        val currentPlayerName = currentPlayer().name
+        playerNameView.text = currentPlayerName
+        playerNameView.contentDescription = getString(
+            R.string.player_name_accessibility_format,
+            currentPlayerName
+        )
     }
 
     private fun advanceToNextPlayer() {

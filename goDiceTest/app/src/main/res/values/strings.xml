@@ -40,6 +40,7 @@
     <string name="player_name_hint_4">Player 4 name</string>
     <string name="start_game">Start game</string>
     <string name="player_label">Player:</string>
+    <string name="player_name_accessibility_format">Player: %1$s</string>
     <string name="next_player_turn">Next player: %1$s</string>
     <string name="final_scores">Final scores</string>
     <string name="winner_label">Winner</string>
