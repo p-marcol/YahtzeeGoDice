@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.graphics.Color
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -28,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godicetest.activities.PlayerSetupActivity
+import com.example.godicetest.adapters.DiceAdapter
 import com.example.godicetest.adapters.DiceViewAdapter
 import com.example.godicetest.extensions.setNeonColor
 import com.example.godicetest.extensions.setNeonGlow
@@ -36,6 +38,7 @@ import com.example.godicetest.interfaces.IDiceManager
 import com.example.godicetest.interfaces.IDiceStateListener
 import com.example.godicetest.managers.DiceManagerFactory
 import com.example.godicetest.managers.DiceSelector
+import com.example.godicetest.utils.getDiceColorName
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
@@ -54,6 +57,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var diceViewer: RecyclerView
     private lateinit var diceViewAdapter: DiceViewAdapter
     private var diceSelector: DiceSelector? = null
+    private lateinit var languageButton: Button
+    private var hasScannedDice: Boolean = false
     //endregion
 
     //region Lifecycle
@@ -72,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         scrollView = findViewById(R.id.scrollView)
         recyclerView = findViewById(R.id.diceRecyclerView)
         diceViewer = findViewById(R.id.diceViewer)
+        languageButton = findViewById(R.id.languageButton)
 
         DiceManagerFactory.mode = if (BuildConfig.USE_MOCK_DICE) {
             DiceManagerFactory.Mode.MOCK
@@ -82,11 +88,12 @@ class MainActivity : AppCompatActivity() {
         diceManager = DiceManagerFactory.getManager()
         diceManager.addListener(object : IDiceStateListener {
             override fun onColorChanged(dice: IDice, color: Int) {
+                val colorName = getDiceColorName(color)
                 Log.d(
                     "MainActivity",
-                    "Dice ${dice.getDieName()} Color Changed: ${dice.getColorName()}"
+                    "Dice ${dice.getDieName()} Color Changed: $colorName"
                 )
-                appendLog("Dice ${dice.getDieName()} Color Changed: ${dice.getColorName()}")
+                appendLog("Dice ${dice.getDieName()} Color Changed: $colorName")
             }
 
             override fun onStable(dice: IDice, face: Int) {
@@ -164,6 +171,10 @@ class MainActivity : AppCompatActivity() {
         val gotoGameBtn = findViewById<Button>(R.id.goto_game)
         scanButton.setNeonColor("#FF00FF")
 
+        hasScannedDice = savedInstanceState?.getBoolean(KEY_HAS_SCANNED_DICE)
+            ?: diceManager.getAllDice().isNotEmpty()
+        applyScanUiState(scanButton, diceSelection, gotoGameBtn)
+
         scanButton.setOnClickListener {
             val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
             val adapter = bluetoothManager.adapter
@@ -197,9 +208,19 @@ class MainActivity : AppCompatActivity() {
                 scanButton.visibility = View.GONE
                 diceSelection.visibility = View.VISIBLE
                 gotoGameBtn.visibility = View.VISIBLE
+                hasScannedDice = true
                 diceManager.startScan(adapter) {}
             }
         }
+
+        languageButton.setNeonGlow(
+            "#00FFAA",
+            strokeWidth = 2,
+            cornerRadius = 14f,
+            paddingDp = 8,
+            glowRadii = listOf(2f, 4f, 8f)
+        )
+        updateLanguageButtonLabel()
 
         val selectButton = findViewById<Button>(R.id.selectionButton)
 
@@ -239,8 +260,24 @@ class MainActivity : AppCompatActivity() {
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
+        languageButton.setOnClickListener {
+            // Android 13+ - systemowy picker
+            val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS)
+            intent.data = Uri.fromParts("package", packageName, null)
+            startActivity(intent)
+        }
     }
     //endregion
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(KEY_HAS_SCANNED_DICE, hasScannedDice)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateLanguageButtonLabel()
+    }
 
     //region UI helpers
     /**
@@ -281,6 +318,24 @@ class MainActivity : AppCompatActivity() {
             )
         diceViewer.adapter = diceViewAdapter
         Log.d("DiceList", "Dice list updated")
+    }
+
+    private fun applyScanUiState(
+        scanButton: Button,
+        diceSelection: LinearLayout,
+        gotoGameBtn: Button
+    ) {
+        if (hasScannedDice) {
+            scanButton.visibility = View.GONE
+            scanButton.isEnabled = false
+            diceSelection.visibility = View.VISIBLE
+            gotoGameBtn.visibility = View.VISIBLE
+        } else {
+            scanButton.visibility = View.VISIBLE
+            scanButton.isEnabled = true
+            diceSelection.visibility = View.INVISIBLE
+            gotoGameBtn.visibility = View.INVISIBLE
+        }
     }
     //endregion
 
@@ -330,6 +385,7 @@ class MainActivity : AppCompatActivity() {
             isAppearanceLightNavigationBars = false
         }
     }
+
 
     //region Game setup hook
     /**
@@ -389,6 +445,17 @@ class MainActivity : AppCompatActivity() {
     }
     //endregion
 
+    //region Language
+    private fun updateLanguageButtonLabel() {
+        val locale = resources.configuration.locales[0]
+        val label = when (locale.language.lowercase()) {
+            "pl" -> getString(R.string.language_short_pl)
+            else -> getString(R.string.language_short_en)
+        }
+        languageButton.text = label
+    }
+    //endregion
+
     //region Logging
     /**
      * Appends a log message to the text view.
@@ -402,6 +469,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
     //endregion
+
+    private companion object {
+        private const val KEY_HAS_SCANNED_DICE = "has_scanned_dice"
+    }
 }
 
 // End of MainActivity.kt.

@@ -1,76 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Yahtzee GoDice</string>
-    <string name="list_of_godice_devices">List of GoDice devices</string>
+    <string name="list_of_godice_devices">List of GoDice Devices</string>
     <string name="connect">Connect</string>
     <string name="color">Color</string>
     <string name="unknown_state">Unknown State</string>
-    <string name="dice_name">Dice Name</string>
-    <string name="scan_dice">Scan for dice…</string>
+    <string name="dice_name">Die Name</string>
+    <string name="scan_dice">Scan for Dice…</string>
+
     <string name="ones">Ones</string>
     <string name="twos">Twos</string>
     <string name="threes">Threes</string>
     <string name="fours">Fours</string>
     <string name="fives">Fives</string>
     <string name="sixes">Sixes</string>
-    <string name="three_of_a_kind">Three of a kind</string>
-    <string name="four_of_a_kind">Four of a kind</string>
+
+    <string name="three_of_a_kind">Three of a Kind</string>
+    <string name="four_of_a_kind">Four of a Kind</string>
     <string name="full_House">Full House</string>
     <string name="small_Straight">Small Straight</string>
     <string name="large_Straight">Large Straight</string>
     <string name="yahtzee">Yahtzee</string>
     <string name="chance">Chance</string>
+
     <string name="total_Score">Total Score</string>
     <string name="round">Round:</string>
     <string name="set_name_title">Set Name</string>
     <string name="not_enough_dice_message">Connect 5 dice to lock in a score.</string>
     <string name="exactly_five_dice_required">You must have exactly 5 dice connected to start the game.</string>
-    <string name="goto_game">GOTO GAME</string>
+    <string name="goto_game">GO TO GAME</string>
     <string name="select_dice">Select Dice</string>
     <string name="_1">1</string>
     <string name="connect_dice_description">Connect %1$s</string>
     <string name="connected_dice_description">Connected %1$s</string>
+
     <string name="players_title">Players</string>
     <string name="player_count_format">Players: %1$d</string>
-    <string name="add_player">Add player</string>
-    <string name="remove_player">Remove player</string>
+    <string name="add_player">Add Player</string>
+    <string name="remove_player">Remove Player</string>
     <string name="player_name_required">Enter a player name.</string>
-    <string name="player_name_hint_1">Player 1 name</string>
-    <string name="player_name_hint_2">Player 2 name</string>
-    <string name="player_name_hint_3">Player 3 name</string>
-    <string name="player_name_hint_4">Player 4 name</string>
-    <string name="start_game">Start game</string>
+    <string name="player_name_hint_1">Player 1 Name</string>
+    <string name="player_name_hint_2">Player 2 Name</string>
+    <string name="player_name_hint_3">Player 3 Name</string>
+    <string name="player_name_hint_4">Player 4 Name</string>
+    <string name="start_game">Start Game</string>
+
     <string name="player_label">Player:</string>
-    <string name="player_name_accessibility_format">Player: %1$s</string>
-    <string name="next_player_turn">Next player: %1$s</string>
-    <string name="final_scores">Final scores</string>
+    <string name="next_player_turn">Next Player: %1$s</string>
+    <string name="final_scores">Final Scores</string>
     <string name="winner_label">Winner</string>
-    <string name="roll_all_dice_required_info">Roll all 5 dice before choosing a points category. Rolled: %1$d/%2$d.</string>
-    <string name="roll_all_dice_required_default">Roll all 5 dice before choosing a points category.</string>
-    <string name="roll_all_dice_required_to_score">Roll all 5 dice first to choose a points category.</string>
+
+    <string name="roll_all_dice_required_info">Roll all 5 dice before choosing a scoring category. Rolled: %1$d/%2$d.</string>
+    <string name="roll_all_dice_required_default">Roll all 5 dice before choosing a scoring category.</string>
+    <string name="roll_all_dice_required_to_score">Roll all 5 dice first to choose a scoring category.</string>
     <string name="roll_all_dice_connect_five">Connect exactly 5 dice to continue your turn.</string>
-    <string name="turn_dice_label">Turn dice</string>
-    <string name="rerolls_left_default">Rerolls left</string>
-    <string name="rerolls_left_format">Rerolls left: %1$d</string>
-    <string name="reroll_in_progress_info">Reroll in progress: %1$d/%2$d rolled.</string>
+
+    <string name="turn_dice_label">Your Dice</string>
+    <string name="rerolls_left_default">Rerolls Left</string>
+    <string name="rerolls_left_format">Rerolls Left: %1$d</string>
+    <string name="reroll_in_progress_info">Reroll in Progress: %1$d/%2$d rolled.</string>
     <string name="reroll_wait_for_completion">Wait for the current reroll to finish.</string>
-    <string name="rerolls_exhausted_info">No rerolls left. Choose a points category.</string>
-    <string name="reroll_hint_info">Tap dice to keep, then roll the rest.</string>
-    <string name="roll_result_accessibility_announcement">You rolled: %1$s</string>
-    <string name="turn_dice_accessibility_summary">Turn dice set. %1$s Double tap a die to toggle blocked state for reroll.</string>
+    <string name="rerolls_exhausted_info">No rerolls left. Choose a scoring category.</string>
+    <string name="reroll_hint_info">Tap dice to keep them, then roll the rest.</string>
+
+    <string name="turn_dice_accessibility_summary">Turn dice set. %1$s Double-tap a die to toggle its blocked state for reroll.</string>
     <string name="dice_slot_accessibility_format">Die %1$d, %2$s, %3$s.</string>
     <string name="dice_slot_state_value">value %1$d</string>
     <string name="dice_slot_state_not_rolled">not rolled yet</string>
     <string name="dice_slot_state_empty">empty slot</string>
     <string name="dice_slot_blocked">blocked</string>
     <string name="dice_slot_not_blocked">not blocked</string>
+
     <string name="bluetooth_required_for_scan">Bluetooth must be enabled to scan for dice.</string>
     <string name="location_required_for_scan">Location (GPS) must be enabled to scan for dice.</string>
     <string name="language_polish">Polish</string>
     <string name="language_english">English</string>
-    <string name="language_short_pl" translatable="false">PL</string>
-    <string name="language_short_en" translatable="false">EN</string>
     <string name="language_button_desc">Change language</string>
-    <string name="change_language">Change Language</string>
+    <string name="change_language">Change language</string>
     <string name="dice_color_black">Black</string>
     <string name="dice_color_red">Red</string>
     <string name="dice_color_green">Green</string>

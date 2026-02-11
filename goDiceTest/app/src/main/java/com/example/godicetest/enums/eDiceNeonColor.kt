@@ -15,7 +15,7 @@ enum class eDiceNeonColor(
     Black("#FFFFFF"),
     Red("#FF0100"),
     Green("#00FF0D"),
-    Blue("#0009FF"),
+    Blue("#00F0FF"),
     Yellow("#FFE300"),
     Orange("#FF5C00"),
     Unknown("#808080")

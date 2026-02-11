@@ -1,16 +1,19 @@
 // DiceAdapter.kt
 // Class for displaying a list of Dice in a RecyclerView.
 // Author: Piotr Marcol
-package com.example.godicetest
+package com.example.godicetest.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.godicetest.R
 import com.example.godicetest.extensions.setNeonGlow
 import com.example.godicetest.interfaces.IDice
+import com.example.godicetest.utils.getDiceColorName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -88,9 +91,9 @@ class DiceAdapter(
         val job = CoroutineScope(Dispatchers.Main).launch {
             combine(dice.lastRoll, dice.isStable, dice.color) { roll, stable, color ->
                 Triple(roll, stable, color)
-            }.collect { (roll, stable) ->
+            }.collect { (roll, stable, color) ->
                 val connected = isDiceConnected(dice)
-                val diceLabel = buildDiceLabel(dice)
+                val diceLabel = buildDiceLabel(dice, holder.itemView.context)
                 holder.tvState.text = when {
                     !connected -> "Not connected"
                     roll == null -> "No roll"
@@ -99,7 +102,7 @@ class DiceAdapter(
                     else -> "Unknown"
                 }
 
-                holder.tvColor.text = dice.getColorName()
+                holder.tvColor.text = holder.itemView.context.getDiceColorName(color)
                 holder.btnConnect.isEnabled = !connected
                 holder.btnConnect.text = if (!connected) "Connect" else "Connected"
                 holder.btnConnect.contentDescription = if (!connected) {
@@ -122,10 +125,10 @@ class DiceAdapter(
 
     //endregion
 
-    private fun buildDiceLabel(dice: IDice): String {
+    private fun buildDiceLabel(dice: IDice, context: Context): String {
         val name = dice.getDieName()?.trim().orEmpty()
         if (name.isNotEmpty()) return name
-        val color = dice.getColorName()?.trim().orEmpty()
+        val color = context.getDiceColorName(dice.color.value).trim()
         return if (color.isNotEmpty()) "$color dice" else "Dice ${dice.id}"
     }
 }

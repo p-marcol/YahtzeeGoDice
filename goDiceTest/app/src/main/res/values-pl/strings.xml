@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="list_of_godice_devices">Lista urządzeń GoDice</string>
+    <string name="connect">Połącz</string>
+    <string name="color">Kolor</string>
+    <string name="unknown_state">Nieznany stan</string>
+    <string name="dice_name">Nazwa kostki</string>
+    <string name="scan_dice">Wyszukaj kostki…</string>
+    <string name="ones">Jedynki</string>
+    <string name="twos">Dwójki</string>
+    <string name="threes">Trójki</string>
+    <string name="fours">Czwórki</string>
+    <string name="fives">Piątki</string>
+    <string name="sixes">Szóstki</string>
+
+    <string name="three_of_a_kind">Trójka</string>
+    <string name="four_of_a_kind">Kareta</string>
+    <string name="full_House">Full</string>
+    <string name="small_Straight">Mały straight</string>
+    <string name="large_Straight">Duży straight</string>
+    <string name="yahtzee">Generał</string>
+    <string name="chance">Szansa</string>
+
+    <string name="total_Score">Suma punktów</string>
+    <string name="round">Runda:</string>
+    <string name="set_name_title">Nazwa zestawu</string>
+    <string name="not_enough_dice_message">Połącz 5 kostek, aby zatwierdzić wynik.</string>
+    <string name="exactly_five_dice_required">Musisz mieć dokładnie 5 połączonych kostek, aby rozpocząć grę.</string>
+    <string name="goto_game">PRZEJDŹ DO GRY</string>
+    <string name="select_dice">Wybierz kostki</string>
+    <string name="_1">1</string>
+    <string name="connect_dice_description">Połącz %1$s</string>
+    <string name="connected_dice_description">Połączono %1$s</string>
+
+    <string name="players_title">Gracze</string>
+    <string name="player_count_format">Gracze: %1$d</string>
+    <string name="add_player">Dodaj gracza</string>
+    <string name="remove_player">Usuń gracza</string>
+    <string name="player_name_required">Wpisz nazwę gracza.</string>
+    <string name="player_name_hint_1">Imię gracza 1</string>
+    <string name="player_name_hint_2">Imię gracza 2</string>
+    <string name="player_name_hint_3">Imię gracza 3</string>
+    <string name="player_name_hint_4">Imię gracza 4</string>
+    <string name="start_game">Rozpocznij grę</string>
+
+    <string name="player_label">Gracz:</string>
+    <string name="next_player_turn">Następny gracz: %1$s</string>
+    <string name="final_scores">Wyniki końcowe</string>
+    <string name="winner_label">Zwycięzca</string>
+
+    <string name="roll_all_dice_required_info">Rzuć wszystkimi 5 kostkami przed wyborem kategorii. Rzucono: %1$d/%2$d.</string>
+    <string name="roll_all_dice_required_default">Rzuć wszystkimi 5 kostkami przed wyborem kategorii.</string>
+    <string name="roll_all_dice_required_to_score">Najpierw rzuć wszystkimi 5 kostkami, aby wybrać kategorię.</string>
+    <string name="roll_all_dice_connect_five">Połącz dokładnie 5 kostek, aby kontynuować turę.</string>
+
+    <string name="turn_dice_label">Twoje kostki</string>
+    <string name="rerolls_left_default">Pozostałe przerzuty</string>
+    <string name="rerolls_left_format">Pozostałe przerzuty: %1$d</string>
+    <string name="reroll_in_progress_info">Trwa przerzut: %1$d/%2$d rzucono.</string>
+    <string name="reroll_wait_for_completion">Poczekaj na zakończenie aktualnego przerzutu.</string>
+    <string name="rerolls_exhausted_info">Brak przerzutów. Wybierz kategorię.</string>
+    <string name="reroll_hint_info">Dotknij kostki, aby ją zatrzymać, następnie rzuć pozostałymi.</string>
+
+    <string name="turn_dice_accessibility_summary">Zestaw kostek w turze. %1$s Dwukrotnie dotknij kostki, aby zmienić jej stan blokady przed przerzutem.</string>
+    <string name="dice_slot_accessibility_format">Kostka %1$d, %2$s, %3$s.</string>
+    <string name="dice_slot_state_value">wartość %1$d</string>
+    <string name="dice_slot_state_not_rolled">jeszcze nie rzucono</string>
+    <string name="dice_slot_state_empty">puste miejsce</string>
+    <string name="dice_slot_blocked">zablokowana</string>
+    <string name="dice_slot_not_blocked">niezablokowana</string>
+
+    <string name="bluetooth_required_for_scan">Aby skanować kostki, Bluetooth musi być włączony.</string>
+    <string name="location_required_for_scan">Aby skanować kostki, lokalizacja (GPS) musi być włączona.</string>
+    <string name="language_polish">Polski</string>
+    <string name="language_english">Angielski</string>
+    <string name="language_button_desc">Zmień język</string>
+    <string name="change_language">Zmień język</string>
+    <string name="dice_color_black">Czarny</string>
+    <string name="dice_color_red">Czerwony</string>
+    <string name="dice_color_green">Zielony</string>
+    <string name="dice_color_blue">Niebieski</string>
+    <string name="dice_color_yellow">Żółty</string>
+    <string name="dice_color_orange">Pomarańczowy</string>
+    <string name="dice_color_unknown">Nieznany</string>
+</resources>
