@@ -61,6 +61,7 @@ class GameActivity : AppCompatActivity() {
     private var currentRerollTargetIds: Set<Int> = emptySet()
     private val currentRerollRolledIds = mutableSetOf<Int>()
     private var rerollStartBlockedUntilMs = 0L
+    private var pendingRollAnnouncement: String? = null
 
     private var activeDisplayDiceIds: List<Int?> = List(REQUIRED_DICE_COUNT) { null }
 
@@ -226,6 +227,7 @@ class GameActivity : AppCompatActivity() {
                 turnRollSnapshots[dice.id] = snapshot
                 if (hasInitialRollCompleted()) {
                     rerollStartBlockedUntilMs = SystemClock.elapsedRealtime() + REROLL_START_DELAY_MS
+                    queueRollAnnouncementIfReady()
                 }
             }
             return
@@ -266,6 +268,7 @@ class GameActivity : AppCompatActivity() {
 
         // Requirement: when reroll completes, LEDs must be turned off for all dice.
         turnOffAllDiceLeds()
+        queueRollAnnouncementIfReady()
     }
 
     private fun onTurnDiceSlotClicked(index: Int) {
@@ -567,7 +570,24 @@ class GameActivity : AppCompatActivity() {
         }
 
     private fun refreshOnUi() {
-        runOnUiThread { refreshDiceSetsFromManager() }
+        runOnUiThread {
+            refreshDiceSetsFromManager()
+            pendingRollAnnouncement?.let { announcement ->
+                turnDiceSet.announceForAccessibility(announcement)
+                pendingRollAnnouncement = null
+            }
+        }
+    }
+
+    private fun queueRollAnnouncementIfReady() {
+        if (requiredTurnDiceIds.size < REQUIRED_DICE_COUNT) return
+        val rolledFaces = requiredTurnDiceIds.mapNotNull { id -> turnRollSnapshots[id]?.face }
+        if (rolledFaces.size < REQUIRED_DICE_COUNT) return
+
+        pendingRollAnnouncement = getString(
+            R.string.roll_result_accessibility_announcement,
+            rolledFaces.joinToString(", ")
+        )
     }
 
     private fun handleDiceSetClick(combination: eYahtzeeCombination) {

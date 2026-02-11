@@ -55,6 +55,7 @@
     <string name="reroll_wait_for_completion">Wait for the current reroll to finish.</string>
     <string name="rerolls_exhausted_info">No rerolls left. Choose a points category.</string>
     <string name="reroll_hint_info">Tap dice to keep, then roll the rest.</string>
+    <string name="roll_result_accessibility_announcement">You rolled: %1$s</string>
     <string name="turn_dice_accessibility_summary">Turn dice set. %1$s Double tap a die to toggle blocked state for reroll.</string>
     <string name="dice_slot_accessibility_format">Die %1$d, %2$s, %3$s.</string>
     <string name="dice_slot_state_value">value %1$d</string>
