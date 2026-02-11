@@ -139,3 +139,6 @@ class MockDiceManager private constructor() : IDiceManager {
     }
     //endregion
 }
+
+// MockDiceManager.kt complete.
+// Fake dice. Real consequences.

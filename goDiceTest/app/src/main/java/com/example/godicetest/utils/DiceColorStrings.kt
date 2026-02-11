@@ -15,3 +15,6 @@ fun Context.getDiceColorName(color: Int?): String {
         else -> getString(R.string.dice_color_unknown)
     }
 }
+
+// Nothing more to see for DiceColorStrings.kt.
+// Even dice answer when called.

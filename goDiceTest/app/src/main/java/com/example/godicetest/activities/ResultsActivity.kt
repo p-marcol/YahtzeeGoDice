@@ -91,3 +91,8 @@ class ResultsActivity : AppCompatActivity() {
         const val EXTRA_PLAYER_SCORES = "com.example.godicetest.results.player_scores"
     }
 }
+
+// ResultsActivity.kt finished
+// Scores written.
+// The devil keeps the ledger.
+

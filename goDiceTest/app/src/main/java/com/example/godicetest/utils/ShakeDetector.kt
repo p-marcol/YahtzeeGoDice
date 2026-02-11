@@ -77,3 +77,6 @@ object ShakeDetector : SensorEventListener {
 
     //endregion
 }
+
+// ShakeDetector.kt shaken out.
+// Even the devil looks up when the table shakes.

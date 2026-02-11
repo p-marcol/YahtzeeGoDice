@@ -21,3 +21,7 @@ object DiceManagerFactory {
     }
     //endregion
 }
+
+// End of DiceManagerFactory.kt.
+// Some nights are real. Some are rehearsals.
+

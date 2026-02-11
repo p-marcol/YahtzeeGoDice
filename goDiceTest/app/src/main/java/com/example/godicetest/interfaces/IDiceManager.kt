@@ -26,3 +26,6 @@ interface IDiceManager {
     fun turnOffAllDiceLed()
     //endregion
 }
+
+// IDiceManager.kt complete.
+// Nothing rolls without his nod.

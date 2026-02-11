@@ -104,3 +104,6 @@ class DiceSelector(
     override fun onConnectionChanged(dice: IDice, connected: Boolean) {}
     //endregion
 }
+
+// DiceSelector.kt ends here.
+// The chosen remain. The rest lose their heads.

@@ -141,4 +141,5 @@ fun getColorHex(color: Int): String {
 }
 //endregion
 
-// End of adapter. Luck’s a fiery mistress tonight.
+// End of adapter.
+// The table never lies.

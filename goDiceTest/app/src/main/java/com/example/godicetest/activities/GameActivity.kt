@@ -226,7 +226,8 @@ class GameActivity : AppCompatActivity() {
             if (!turnRollSnapshots.containsKey(dice.id)) {
                 turnRollSnapshots[dice.id] = snapshot
                 if (hasInitialRollCompleted()) {
-                    rerollStartBlockedUntilMs = SystemClock.elapsedRealtime() + REROLL_START_DELAY_MS
+                    rerollStartBlockedUntilMs =
+                        SystemClock.elapsedRealtime() + REROLL_START_DELAY_MS
                     queueRollAnnouncementIfReady()
                 }
             }
@@ -764,3 +765,6 @@ class GameActivity : AppCompatActivity() {
                 .putStringArrayListExtra(EXTRA_PLAYER_NAMES, names)
     }
 }
+
+// End of GameActivity.
+// Five dice. Two rerolls. Infinite regret.

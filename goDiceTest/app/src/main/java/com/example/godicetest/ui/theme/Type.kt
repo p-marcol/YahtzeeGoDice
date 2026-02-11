@@ -34,3 +34,6 @@ val Typography = Typography(
     */
 )
 //endregion
+
+// End of Type.kt.
+// Every warning sounds better in neon.

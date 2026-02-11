@@ -101,7 +101,8 @@ class PlayerSetupActivity : AppCompatActivity() {
             names.add(name)
         }
         if (names.isEmpty()) {
-            Toast.makeText(this, getString(R.string.player_name_required), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.player_name_required), Toast.LENGTH_SHORT)
+                .show()
             return null
         }
         return names
@@ -154,3 +155,7 @@ class PlayerSetupActivity : AppCompatActivity() {
         private const val MIN_PLAYERS = 1
     }
 }
+
+// End of PlayerSetupActivity.kt
+// Players registered.
+// The table was already waiting.
