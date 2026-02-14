@@ -6,126 +6,159 @@
 ![Silesian University of Technology](https://img.shields.io/badge/University-Silesian%20University%20of%20Technology-0057B8)
 ![2026](https://img.shields.io/badge/Year-2026-orange)
 
-**YahtzeeGoDice** is a mobile application that brings the classic game **Yahtzee** to life using physical **GoDice** smart dice.  
-The app uses Bluetooth Low Energy to connect with GoDice and react to real dice rolls in real-time.
+**YahtzeeGoDice** is an Android mobile app that brings classic **Yahtzee** to physical **GoDice** smart dice.
+The app uses Bluetooth Low Energy (BLE) for real dice, and also supports a **mock** mode for development without hardware.
 
 ---
 
 ## 🎯 Features
 
--   Connect and manage multiple GoDice devices
--   Real-time roll detection and color updates
--   Optional Mock Dice mode for development (dice appear only after tapping **Scan Dice**)
--   Full Yahtzee gameplay mechanics:
-    -   Up to 3 rolls per turn
-    -   Automatic scoring system
-    -   All standard scoreboard fields
--   Simple and intuitive mobile UI
--   Game progress synced with physical dice actions
-
-> Project status: **Work in progress** 🚧
+- Connect and manage multiple GoDice devices
+- Real-time dice events: roll, stable face, color, charging state, battery level
+- Full Yahtzee gameplay flow:
+  - Exactly 5 dice required per turn
+  - Up to 2 rerolls per turn (hold/lock selected dice)
+  - 13 standard Yahtzee scoring categories
+  - 1-4 players
+  - Final scoreboard with winner highlight
+- Optional `mock` flavor for hardware-free testing
+- UI localization support: `en-US` and `pl`
 
 ---
 
 ## 🧩 Technologies
 
--   **Kotlin / Android**
--   **Bluetooth Low Energy** communication
--   GoDice Official SDK:
-    -   <https://github.com/ParticulaCode/GoDiceAndroid_iOS_API>
--   Architecture based on Manager + Observer pattern
+- **Kotlin / Android**
+- **Bluetooth Low Energy** communication
+- Local GoDice SDK module (`godicesdklib`) with JNI bridge to native C code
+- Manager + Listener/Observer-style event distribution
 
 ---
 
-## 📦 Installation & Setup
+## 📦 Project Structure
 
-1. Clone the repository:
+- `goDiceTest/app` - main Android application module
+- `goDiceTest/godicesdklib` - Android library module exposing `GoDiceSDK` (JNI + native API)
+- `common` - native C API files (`godiceapi.c/.h`)
+- `common/test` - native C++ test target (CMake)
 
-    ```bash
-    git clone https://github.com/p-marcol/YahtzeeGoDice.git
-    cd YahtzeeGoDice
-    ```
+---
 
-2. Open the project in Android Studio
-3. Connect a real Android device (BLE features are not supported on most emulators)
-4. Pair your GoDice and run the app ✅
+## ✅ Requirements
+
+- Android Studio
+- JDK 11
+- Android SDK for app module:
+  - `minSdk = 33`
+  - `targetSdk = 36`
+  - `compileSdk = 36`
+- For `real` flavor testing:
+  - physical Android device with BLE
+  - Bluetooth enabled
+  - Location services enabled (GPS)
+
+> BLE behavior is device-dependent; emulator support is typically insufficient for real GoDice testing.
+
+---
+
+## 🚀 Build & Run
+
+From project root:
+
+```bash
+cd goDiceTest
+```
+
+Build real flavor:
+
+```bash
+./gradlew assembleRealDebug
+```
+
+Install real flavor on connected device:
+
+```bash
+./gradlew installRealDebug
+```
+
+Build/install mock flavor:
+
+```bash
+./gradlew assembleMockDebug
+./gradlew installMockDebug
+```
 
 ---
 
 ## 🧪 Mock Dice Mode
 
-Need to work without real hardware? Use the `mock` build flavor:
+Use the `mock` build flavor when you do not have physical GoDice available.
 
-```bash
-./gradlew :app:assembleMockDebug
-```
+- App uses `MockDiceManager` instead of BLE manager
+- Mock dice are created after tapping **Scan Dice**
+- After connecting mock dice, rolls are simulated by shaking the phone (accelerometer)
+- Game logic and scoring flow remain the same as in `real`
 
-In this flavor the app wires itself to `MockDiceManager`. Mock dice are created **only after** you tap the **Scan Dice** button, mirroring the flow of the real scanner. Everything else (selection, LED prompts, UI updates) behaves the same, so you can iterate quickly before testing on real GoDice.
+---
 
-Switch back to the `real` flavor when targeting physical dice:
+## 🎮 App Flow
 
-```bash
-./gradlew :app:assembleRealDebug
-```
+1. `MainActivity` - scan and connect dice
+2. Select exactly 5 dice for gameplay
+3. `PlayerSetupActivity` - set player count and names (1-4)
+4. `GameActivity` - Yahtzee turns and scoring
+5. `ResultsActivity` - final scores and winner(s)
 
 ---
 
 ## 🔗 GoDice SDK Integration
 
-The project uses the official GoDice Android/iOS API for:
-
--   Listening to physical dice events (roll, color, battery)
--   Mapping SDK dice identifiers to in-app dice
--   Updating UI and game logic based on sensor data
-
-Example listener initialization:
-
-```kotlin
-init {
-    GoDiceSDK.listener = object : GoDiceSDK.Listener {
-        override fun onDiceColor(diceId: Int, color: Int) {
-            Log.d("DiceManager", "Dice color changed: ID=$diceId, Color=$color")
-            val dice = getDiceBySdkId(diceId) ?: return
-            dice.color.value = color
-            listeners.forEach { it.onColorChanged(dice, color) }
-        }
-    }
-}
-```
-
-📌 **Important:**
-The listener must be set before making any other SDK calls
-to ensure no events are lost.
+- `godicesdklib` loads native `godicesdklib` via JNI
+- Native build compiles:
+  - `goDiceTest/godicesdklib/src/main/c/jni/jni_def.c`
+  - `common/godiceapi.c`
+- `DiceManager` sets `GoDiceSDK.listener` and maps SDK callbacks into app-level state updates
 
 ---
 
-## 🧱 Architecture Overview
+## 🔐 Permissions
 
-```mermaid
-flowchart LR
-    A[GoDice SDK] --> B
-    B[DiceManager] --> C
-    C[Game Logic] --> D
-    D[UI]
+Manifest declarations include:
+
+- `BLUETOOTH`, `BLUETOOTH_ADMIN`
+- `BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`
+- `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`
+
+Runtime flow requests the required permissions/enablers before scanning.
+
+---
+
+## 🧱 Tests
+
+Android tests (template-level):
+
+```bash
+cd goDiceTest
+./gradlew test
+./gradlew connectedAndroidTest
 ```
 
--   `DiceManager` — central BLE & SDK communication controller
--   Observer pattern for distributing events across UI and logic
--   Clear separation between hardware layer and game mechanics
+Native C++ test target exists in `common/test` (separate CMake flow).
 
 ---
 
 ## License
 
-License: **TBD**
-Note: The **GoDice SDK** has its own licensing terms. Please refer to the official GoDice repository for details.
+License: **All Rights Reserved (view-only)**
+
+Note: GoDice SDK/API components may be subject to separate licensing terms.
 
 ---
 
 ## Authors
 
--   **Piotr Marcol** - [p-marcol](https://github.com/p-marcol)
--   **Jakub Barylak** - [Jakub-Barylak](https://github.com/Jakub-Barylak)
+- **Piotr Marcol** - [p-marcol](https://github.com/p-marcol)
+- **Jakub Barylak** - [Jakub-Barylak](https://github.com/Jakub-Barylak)
 
 ---
 
